@@ -63,10 +63,14 @@ static CRITICAL_SECTION cancelConnLock;
 #endif
 
 /*
- * Additional callback for cancellations.
+ * Additional callback for cancellations which is called prior to PQcancel.
  */
-static void (*cancel_callback) (void) = NULL;
+static cancel_callback *pre_cancel_callback = NULL;
 
+/*
+ * Additional callback for cancellations which is called after PQcancel.
+ */
+static cancel_callback *post_cancel_callback = NULL;
 
 /*
  * SetCancelConn
@@ -157,8 +161,8 @@ handle_sigint(SIGNAL_ARGS)
 
 	CancelRequested = true;
 
-	if (cancel_callback != NULL)
-		cancel_callback();
+	if (pre_cancel_callback != NULL)
+		pre_cancel_callback();
 
 	/* Send QueryCancel if we are processing a database query */
 	if (cancelConn != NULL)
@@ -174,6 +178,9 @@ handle_sigint(SIGNAL_ARGS)
 		}
 	}
 
+	if (post_cancel_callback != NULL)
+		post_cancel_callback();
+
 	errno = save_errno;			/* just in case the write changed it */
 }
 
@@ -183,9 +190,11 @@ handle_sigint(SIGNAL_ARGS)
  * Register query cancellation callback for SIGINT.
  */
 void
-setup_cancel_handler(void (*query_cancel_callback) (void))
+setup_cancel_handler(cancel_callback *query_pre_cancel_callback,
+					 cancel_callback *query_post_cancel_callback)
 {
-	cancel_callback = query_cancel_callback;
+	pre_cancel_callback = query_pre_cancel_callback;
+	post_cancel_callback = query_post_cancel_callback;
 	cancel_sent_msg = _("Cancel request sent\n");
 	cancel_not_sent_msg = _("Could not send cancel request: ");
 
@@ -204,8 +213,8 @@ consoleHandler(DWORD dwCtrlType)
 	{
 		CancelRequested = true;
 
-		if (cancel_callback != NULL)
-			cancel_callback();
+		if (pre_cancel_callback != NULL)
+			pre_cancel_callback();
 
 		/* Send QueryCancel if we are processing a database query */
 		EnterCriticalSection(&cancelConnLock);
@@ -224,6 +233,9 @@ consoleHandler(DWORD dwCtrlType)
 
 		LeaveCriticalSection(&cancelConnLock);
 
+		if (post_cancel_callback != NULL)
+			post_cancel_callback();
+
 		return TRUE;
 	}
 	else
@@ -232,9 +244,11 @@ consoleHandler(DWORD dwCtrlType)
 }
 
 void
-setup_cancel_handler(void (*callback) (void))
+setup_cancel_handler(cancel_callback *query_pre_cancel_callback,
+					 cancel_callback *query_post_cancel_callback)
 {
-	cancel_callback = callback;
+	pre_cancel_callback = query_pre_cancel_callback;
+	post_cancel_callback = query_post_cancel_callback;
 	cancel_sent_msg = _("Cancel request sent\n");
 	cancel_not_sent_msg = _("Could not send cancel request: ");
 

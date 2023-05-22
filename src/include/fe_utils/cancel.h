@@ -18,6 +18,8 @@
 
 #include "libpq-fe.h"
 
+typedef void cancel_callback(void);
+
 extern PGDLLIMPORT volatile sig_atomic_t CancelRequested;
 
 extern void SetCancelConn(PGconn *conn);
@@ -27,6 +29,7 @@ extern void ResetCancelConn(void);
  * A callback can be optionally set up to be called at cancellation
  * time.
  */
-extern void setup_cancel_handler(void (*query_cancel_callback) (void));
+extern void setup_cancel_handler(cancel_callback *query_pre_cancel_callback,
+								 cancel_callback *query_post_cancel_callback);
 
 #endif							/* CANCEL_H */

@@ -39,6 +39,7 @@
 #include <math.h>
 #include <signal.h>
 #include <time.h>
+#include <unistd.h>
 #include <sys/time.h>
 #include <sys/resource.h>		/* for getrlimit */
 
@@ -60,6 +61,7 @@
 #include "common/username.h"
 #include "fe_utils/cancel.h"
 #include "fe_utils/conditional.h"
+#include "fe_utils/exit_codes.h"
 #include "fe_utils/option_utils.h"
 #include "fe_utils/string_utils.h"
 #include "getopt_long.h"
@@ -4944,9 +4946,6 @@ initGenerateDataClientSide(PGconn *con)
 		if (PQputline(con, sql.data))
 			pg_fatal("PQputline failed");
 
-		if (CancelRequested)
-			break;
-
 		/*
 		 * If we want to stick with the original logging, print a message each
 		 * 100k inserted rows.
@@ -5140,6 +5139,16 @@ checkInitSteps(const char *initialize_steps)
 }
 
 /*
+ * This function is called within a signal handler. Only use signal-safe
+ * functions. See signal-safety(7) for more information.
+ */
+static void
+post_cancel_callback(void)
+{
+	_exit(EXIT_USER);
+}
+
+/*
  * Invoke each initialization step in the given string
  */
 static void
@@ -5156,7 +5165,7 @@ runInitSteps(const char *initialize_steps)
 	if ((con = doConnect()) == NULL)
 		pg_fatal("could not create connection for initialization");
 
-	setup_cancel_handler(NULL);
+	setup_cancel_handler(NULL, post_cancel_callback);
 	SetCancelConn(con);
 
 	for (step = initialize_steps; *step != '\0'; step++)
