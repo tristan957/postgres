@@ -10,6 +10,7 @@
 #include "command.h"
 #include "common.h"
 #include "common/logging.h"
+#include "fe_utils/exit_codes.h"
 #include "input.h"
 #include "mainloop.h"
 #include "mb/pg_wchar.h"

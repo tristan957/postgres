@@ -25,6 +25,7 @@
 #include "copy.h"
 #include "crosstabview.h"
 #include "fe_utils/cancel.h"
+#include "fe_utils/exit_codes.h"
 #include "fe_utils/mbprint.h"
 #include "fe_utils/string_utils.h"
 #include "portability/instr_time.h"
@@ -273,7 +274,7 @@ psql_cancel_callback(void)
 void
 psql_setup_cancel_handler(void)
 {
-	setup_cancel_handler(psql_cancel_callback);
+	setup_cancel_handler(psql_cancel_callback, NULL);
 }
 
 

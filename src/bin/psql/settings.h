@@ -157,17 +157,4 @@ typedef struct _psqlSettings
 
 extern PsqlSettings pset;
 
-
-#ifndef EXIT_SUCCESS
-#define EXIT_SUCCESS 0
-#endif
-
-#ifndef EXIT_FAILURE
-#define EXIT_FAILURE 1
-#endif
-
-#define EXIT_BADCONN 2
-
-#define EXIT_USER 3
-
 #endif

@@ -19,6 +19,7 @@
 #include "common/logging.h"
 #include "common/string.h"
 #include "describe.h"
+#include "fe_utils/exit_codes.h"
 #include "fe_utils/print.h"
 #include "getopt_long.h"
 #include "help.h"
