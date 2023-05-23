@@ -67,6 +67,24 @@ $node->pgbench(
 	],
 	'pgbench scale 1 initialization',);
 
+# Check that the pgbench_branches and pgbench_tellers filler columns are filled
+# with NULLs
+foreach my $table ('pgbench_branches', 'pgbench_tellers') {
+	my ($ret, $out, $err) = $node->psql(
+		'postgres',
+		"SELECT COUNT(1) FROM $table;
+		 SELECT COUNT(1) FROM $table WHERE filler is NULL;",
+		extra_params => ['--no-align', '--tuples-only']);
+
+	is($ret, 0, "psql $table counts status is 0");
+	is($err, '', "psql $table counts stderr is empty");
+	if ($out =~ m/^(\d+)\n(\d+)$/g) {
+		is($1, $2, "psql $table filler column filled with NULLs");
+	} else {
+		fail("psql $table stdout m/^(\\d+)\n(\\d+)$/g");
+	}
+}
+
 # Again, with all possible options
 $node->pgbench(
 	'--initialize --init-steps=dtpvg --scale=1 --unlogged-tables --fillfactor=98 --foreign-keys --quiet --tablespace=regress_pgbench_tap_1_ts --index-tablespace=regress_pgbench_tap_1_ts --partitions=2 --partition-method=hash',
