@@ -1939,6 +1939,7 @@ CatCacheCopyKeys(TupleDesc tupdesc, int nkeys, int *attnos,
 
 	for (i = 0; i < nkeys; i++)
 	{
+		int16		attlen;
 		int			attnum = attnos[i];
 		Form_pg_attribute att = TupleDescAttr(tupdesc, attnum - 1);
 		Datum		src = srckeys[i];
@@ -1954,11 +1955,16 @@ CatCacheCopyKeys(TupleDesc tupdesc, int nkeys, int *attnos,
 		{
 			namestrcpy(&srcname, DatumGetCString(src));
 			src = NameGetDatum(&srcname);
+
+			/* No need to copy the full buffer if the string is shorter */
+			attlen = strnlen(NameStr(srcname), NAMEDATALEN);
+		} else {
+			attlen = att->attlen;
 		}
 
 		dstkeys[i] = datumCopy(src,
 							   att->attbyval,
-							   att->attlen);
+							   attlen);
 	}
 }
 
