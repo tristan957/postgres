@@ -562,6 +562,7 @@ typedef struct XLogCtlData
 static XLogCtlData *XLogCtl = NULL;
 
 /* a private copy of XLogCtl->Insert.WALInsertLocks, for convenience */
+#define WALInsertLocks BLESSED_WALInsertLocks
 static WALInsertLockPadded *WALInsertLocks = NULL;
 
 /*
@@ -4599,7 +4600,10 @@ XLOGShmemInit(void)
 		Assert(foundCFile && foundXLog);
 
 		/* Initialize local copy of WALInsertLocks */
-		WALInsertLocks = XLogCtl->Insert.WALInsertLocks;
+		WALInsertLocks =
+#undef WALInsertLocks
+			XLogCtl->Insert.WALInsertLocks;
+#define WALInsertLocks BLESSED_WALInsertLocks
 
 		if (localControlFile)
 			pfree(localControlFile);
@@ -4631,7 +4635,10 @@ XLOGShmemInit(void)
 	/* WAL insertion locks. Ensure they're aligned to the full padded size */
 	allocptr += sizeof(WALInsertLockPadded) -
 		((uintptr_t) allocptr) % sizeof(WALInsertLockPadded);
-	WALInsertLocks = XLogCtl->Insert.WALInsertLocks =
+	WALInsertLocks =
+#undef WALInsertLocks
+		XLogCtl->Insert.WALInsertLocks =
+#define WALInsertLocks BLESSED_WALInsertLocks
 		(WALInsertLockPadded *) allocptr;
 	allocptr += sizeof(WALInsertLockPadded) * NUM_XLOGINSERT_LOCKS;
 

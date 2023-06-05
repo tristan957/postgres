@@ -129,10 +129,10 @@ typedef enum WalRcvWakeupReason
 /*
  * Wake up times for periodic tasks.
  */
-static TimestampTz wakeup[NUM_WALRCV_WAKEUPS];
+static session_local TimestampTz wakeup[NUM_WALRCV_WAKEUPS];
 
-static StringInfoData reply_message;
-static StringInfoData incoming_message;
+static session_local StringInfoData reply_message;
+static session_local StringInfoData incoming_message;
 
 /* Prototypes for private functions */
 static void WalRcvFetchTimeLineHistoryFiles(TimeLineID first, TimeLineID last);

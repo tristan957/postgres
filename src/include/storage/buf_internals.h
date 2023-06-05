@@ -313,7 +313,7 @@ extern PGDLLIMPORT ConditionVariableMinimallyPadded *BufferIOCVArray;
 extern PGDLLIMPORT WritebackContext BackendWritebackContext;
 
 /* in localbuf.c */
-extern PGDLLIMPORT BufferDesc *LocalBufferDescriptors;
+extern PGDLLIMPORT session_local BufferDesc *LocalBufferDescriptors;
 
 
 static inline BufferDesc *
