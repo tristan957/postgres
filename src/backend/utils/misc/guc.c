@@ -66,14 +66,14 @@
  */
 #define REALTYPE_PRECISION 17
 
-static int	GUC_check_errcode_value;
+static session_local int	GUC_check_errcode_value;
 
-static List *reserved_class_prefix = NIL;
+static session_local List *reserved_class_prefix = NIL;
 
 /* global variables for check hook support */
-char	   *GUC_check_errmsg_string;
-char	   *GUC_check_errdetail_string;
-char	   *GUC_check_errhint_string;
+session_local char	   *GUC_check_errmsg_string;
+session_local char	   *GUC_check_errdetail_string;
+session_local char	   *GUC_check_errhint_string;
 
 /* Kluge: for speed, we examine this GUC variable's value directly */
 extern bool in_hot_standby_guc;
@@ -191,7 +191,7 @@ static const char *const map_old_guc_names[] = {
 
 
 /* Memory context holding all GUC-related data */
-static MemoryContext GUCMemoryContext;
+static session_local MemoryContext GUCMemoryContext;
 
 /*
  * We use a dynahash table to look up GUCs by name, or to iterate through
@@ -204,7 +204,7 @@ typedef struct
 	struct config_generic *gucvar;	/* -> GUC's defining structure */
 } GUCHashEntry;
 
-static HTAB *guc_hashtab;		/* entries are GUCHashEntrys */
+static session_local HTAB *guc_hashtab;		/* entries are GUCHashEntrys */
 
 /*
  * In addition to the hash table, variables having certain properties are
@@ -214,16 +214,16 @@ static HTAB *guc_hashtab;		/* entries are GUCHashEntrys */
  * and report lists is stylized enough that they can be slists, but the
  * nondef list has to be a dlist to avoid O(N) deletes in common cases.
  */
-static dlist_head guc_nondef_list;	/* list of variables that have source
+static session_local dlist_head guc_nondef_list;	/* list of variables that have source
 									 * different from PGC_S_DEFAULT */
-static slist_head guc_stack_list;	/* list of variables that have non-NULL
+static session_local slist_head guc_stack_list;	/* list of variables that have non-NULL
 									 * stack */
-static slist_head guc_report_list;	/* list of variables that have the
+static session_local slist_head guc_report_list;	/* list of variables that have the
 									 * GUC_NEEDS_REPORT bit set in status */
 
-static bool reporting_enabled;	/* true to enable GUC_REPORT */
+static session_local bool reporting_enabled;	/* true to enable GUC_REPORT */
 
-static int	GUCNestLevel = 0;	/* 1 when in main transaction */
+static session_local int	GUCNestLevel = 0;	/* 1 when in main transaction */
 
 
 static int	guc_var_compare(const void *a, const void *b);
@@ -702,7 +702,7 @@ string_field_used(struct config_string *conf, char *strval)
 {
 	GucStack   *stack;
 
-	if (strval == *(conf->variable) ||
+	if (strval == *(conf->variable_addr()) ||
 		strval == conf->reset_val ||
 		strval == conf->boot_val)
 		return true;
@@ -808,24 +808,24 @@ set_stack_value(struct config_generic *gconf, config_var_value *val)
 	{
 		case PGC_BOOL:
 			val->val.boolval =
-				*((struct config_bool *) gconf)->variable;
+				*((struct config_bool *) gconf)->variable_addr();
 			break;
 		case PGC_INT:
 			val->val.intval =
-				*((struct config_int *) gconf)->variable;
+				*((struct config_int *) gconf)->variable_addr();
 			break;
 		case PGC_REAL:
 			val->val.realval =
-				*((struct config_real *) gconf)->variable;
+				*((struct config_real *) gconf)->variable_addr();
 			break;
 		case PGC_STRING:
 			set_string_field((struct config_string *) gconf,
 							 &(val->val.stringval),
-							 *((struct config_string *) gconf)->variable);
+							 *((struct config_string *) gconf)->variable_addr());
 			break;
 		case PGC_ENUM:
 			val->val.enumval =
-				*((struct config_enum *) gconf)->variable;
+				*((struct config_enum *) gconf)->variable_addr();
 			break;
 	}
 	set_extra_field(gconf, &(val->extra), gconf->extra);
@@ -901,11 +901,6 @@ build_guc_variables(void)
 	GUCHashEntry *hentry;
 	bool		found;
 	int			i;
-	struct config_bool *ConfigureNamesBool = get_configure_names_bool();
-	struct config_int *ConfigureNamesInt = get_configure_names_int();
-	struct config_real *ConfigureNamesReal = get_configure_names_real();
-	struct config_string *ConfigureNamesString = get_configure_names_string();
-	struct config_enum *ConfigureNamesEnum = get_configure_names_enum();
 
 	/*
 	 * Create the memory context that will hold all GUC-related data.
@@ -1035,8 +1030,6 @@ build_guc_variables(void)
 	}
 
 	Assert(num_vars == hash_get_num_entries(guc_hashtab));
-
-	pfree(ConfigureNamesBool);
 }
 
 /*
@@ -1139,7 +1132,8 @@ add_placeholder_variable(const char *name, int elevel)
 	 * 'static' place to point to.  Note that the current value, as well as
 	 * the boot and reset values, start out NULL.
 	 */
-	var->variable = (char **) (var + 1);
+	// FIXME
+	//var->variable = (char **) (var + 1);
 
 	if (!add_guc_variable((struct config_generic *) var, elevel))
 	{
@@ -1416,10 +1410,10 @@ check_GUC_init(struct config_generic *gconf)
 			{
 				struct config_bool *conf = (struct config_bool *) gconf;
 
-				if (*conf->variable && !conf->boot_val)
+				if (*conf->variable_addr() && !conf->boot_val)
 				{
 					elog(LOG, "GUC (PGC_BOOL) %s, boot_val=%d, C-var=%d",
-						 conf->gen.name, conf->boot_val, *conf->variable);
+						 conf->gen.name, conf->boot_val, *conf->variable_addr());
 					return false;
 				}
 				break;
@@ -1428,10 +1422,10 @@ check_GUC_init(struct config_generic *gconf)
 			{
 				struct config_int *conf = (struct config_int *) gconf;
 
-				if (*conf->variable != 0 && *conf->variable != conf->boot_val)
+				if (*conf->variable_addr() != 0 && *conf->variable_addr() != conf->boot_val)
 				{
 					elog(LOG, "GUC (PGC_INT) %s, boot_val=%d, C-var=%d",
-						 conf->gen.name, conf->boot_val, *conf->variable);
+						 conf->gen.name, conf->boot_val, *conf->variable_addr());
 					return false;
 				}
 				break;
@@ -1440,10 +1434,10 @@ check_GUC_init(struct config_generic *gconf)
 			{
 				struct config_real *conf = (struct config_real *) gconf;
 
-				if (*conf->variable != 0.0 && *conf->variable != conf->boot_val)
+				if (*conf->variable_addr() != 0.0 && *conf->variable_addr() != conf->boot_val)
 				{
 					elog(LOG, "GUC (PGC_REAL) %s, boot_val=%g, C-var=%g",
-						 conf->gen.name, conf->boot_val, *conf->variable);
+						 conf->gen.name, conf->boot_val, *conf->variable_addr());
 					return false;
 				}
 				break;
@@ -1452,10 +1446,10 @@ check_GUC_init(struct config_generic *gconf)
 			{
 				struct config_string *conf = (struct config_string *) gconf;
 
-				if (*conf->variable != NULL && strcmp(*conf->variable, conf->boot_val) != 0)
+				if (*conf->variable_addr() != NULL && strcmp(*conf->variable_addr(), conf->boot_val) != 0)
 				{
 					elog(LOG, "GUC (PGC_STRING) %s, boot_val=%s, C-var=%s",
-						 conf->gen.name, conf->boot_val ? conf->boot_val : "<null>", *conf->variable);
+						 conf->gen.name, conf->boot_val ? conf->boot_val : "<null>", *conf->variable_addr());
 					return false;
 				}
 				break;
@@ -1464,10 +1458,10 @@ check_GUC_init(struct config_generic *gconf)
 			{
 				struct config_enum *conf = (struct config_enum *) gconf;
 
-				if (*conf->variable != conf->boot_val)
+				if (*conf->variable_addr() != conf->boot_val)
 				{
 					elog(LOG, "GUC (PGC_ENUM) %s, boot_val=%d, C-var=%d",
-						 conf->gen.name, conf->boot_val, *conf->variable);
+						 conf->gen.name, conf->boot_val, *conf->variable_addr());
 					return false;
 				}
 				break;
@@ -1642,7 +1636,7 @@ InitializeOneGUCOption(struct config_generic *gconf)
 						 conf->gen.name, (int) newval);
 				if (conf->assign_hook)
 					conf->assign_hook(newval, extra);
-				*conf->variable = conf->reset_val = newval;
+				*conf->variable_addr() = conf->reset_val = newval;
 				conf->gen.extra = conf->reset_extra = extra;
 				break;
 			}
@@ -1660,7 +1654,7 @@ InitializeOneGUCOption(struct config_generic *gconf)
 						 conf->gen.name, newval);
 				if (conf->assign_hook)
 					conf->assign_hook(newval, extra);
-				*conf->variable = conf->reset_val = newval;
+				*conf->variable_addr() = conf->reset_val = newval;
 				conf->gen.extra = conf->reset_extra = extra;
 				break;
 			}
@@ -1678,7 +1672,7 @@ InitializeOneGUCOption(struct config_generic *gconf)
 						 conf->gen.name, newval);
 				if (conf->assign_hook)
 					conf->assign_hook(newval, extra);
-				*conf->variable = conf->reset_val = newval;
+				*conf->variable_addr() = conf->reset_val = newval;
 				conf->gen.extra = conf->reset_extra = extra;
 				break;
 			}
@@ -1700,7 +1694,7 @@ InitializeOneGUCOption(struct config_generic *gconf)
 						 conf->gen.name, newval ? newval : "");
 				if (conf->assign_hook)
 					conf->assign_hook(newval, extra);
-				*conf->variable = conf->reset_val = newval;
+				*conf->variable_addr() = conf->reset_val = newval;
 				conf->gen.extra = conf->reset_extra = extra;
 				break;
 			}
@@ -1716,7 +1710,7 @@ InitializeOneGUCOption(struct config_generic *gconf)
 						 conf->gen.name, newval);
 				if (conf->assign_hook)
 					conf->assign_hook(newval, extra);
-				*conf->variable = conf->reset_val = newval;
+				*conf->variable_addr() = conf->reset_val = newval;
 				conf->gen.extra = conf->reset_extra = extra;
 				break;
 			}
@@ -1848,8 +1842,8 @@ SelectConfigFiles(const char *userDoption, const char *progname)
 	 */
 	data_directory_rec = (struct config_string *)
 		find_option("data_directory", false, false, PANIC);
-	if (*data_directory_rec->variable)
-		SetDataDir(*data_directory_rec->variable);
+	if (*data_directory_rec->variable_addr())
+		SetDataDir(*data_directory_rec->variable_addr());
 	else if (configdir)
 		SetDataDir(configdir);
 	else
@@ -2011,7 +2005,7 @@ ResetAllOptions(void)
 					if (conf->assign_hook)
 						conf->assign_hook(conf->reset_val,
 										  conf->reset_extra);
-					*conf->variable = conf->reset_val;
+					*conf->variable_addr() = conf->reset_val;
 					set_extra_field(&conf->gen, &conf->gen.extra,
 									conf->reset_extra);
 					break;
@@ -2023,7 +2017,7 @@ ResetAllOptions(void)
 					if (conf->assign_hook)
 						conf->assign_hook(conf->reset_val,
 										  conf->reset_extra);
-					*conf->variable = conf->reset_val;
+					*conf->variable_addr() = conf->reset_val;
 					set_extra_field(&conf->gen, &conf->gen.extra,
 									conf->reset_extra);
 					break;
@@ -2035,7 +2029,7 @@ ResetAllOptions(void)
 					if (conf->assign_hook)
 						conf->assign_hook(conf->reset_val,
 										  conf->reset_extra);
-					*conf->variable = conf->reset_val;
+					*conf->variable_addr() = conf->reset_val;
 					set_extra_field(&conf->gen, &conf->gen.extra,
 									conf->reset_extra);
 					break;
@@ -2047,7 +2041,7 @@ ResetAllOptions(void)
 					if (conf->assign_hook)
 						conf->assign_hook(conf->reset_val,
 										  conf->reset_extra);
-					set_string_field(conf, conf->variable, conf->reset_val);
+					set_string_field(conf, conf->variable_addr(), conf->reset_val);
 					set_extra_field(&conf->gen, &conf->gen.extra,
 									conf->reset_extra);
 					break;
@@ -2059,7 +2053,7 @@ ResetAllOptions(void)
 					if (conf->assign_hook)
 						conf->assign_hook(conf->reset_val,
 										  conf->reset_extra);
-					*conf->variable = conf->reset_val;
+					*conf->variable_addr() = conf->reset_val;
 					set_extra_field(&conf->gen, &conf->gen.extra,
 									conf->reset_extra);
 					break;
@@ -2372,12 +2366,12 @@ AtEOXact_GUC(bool isCommit, int nestLevel)
 							bool		newval = newvalue.val.boolval;
 							void	   *newextra = newvalue.extra;
 
-							if (*conf->variable != newval ||
+							if (*conf->variable_addr() != newval ||
 								conf->gen.extra != newextra)
 							{
 								if (conf->assign_hook)
 									conf->assign_hook(newval, newextra);
-								*conf->variable = newval;
+								*conf->variable_addr() = newval;
 								set_extra_field(&conf->gen, &conf->gen.extra,
 												newextra);
 								changed = true;
@@ -2390,12 +2384,12 @@ AtEOXact_GUC(bool isCommit, int nestLevel)
 							int			newval = newvalue.val.intval;
 							void	   *newextra = newvalue.extra;
 
-							if (*conf->variable != newval ||
+							if (*conf->variable_addr() != newval ||
 								conf->gen.extra != newextra)
 							{
 								if (conf->assign_hook)
 									conf->assign_hook(newval, newextra);
-								*conf->variable = newval;
+								*conf->variable_addr() = newval;
 								set_extra_field(&conf->gen, &conf->gen.extra,
 												newextra);
 								changed = true;
@@ -2408,12 +2402,12 @@ AtEOXact_GUC(bool isCommit, int nestLevel)
 							double		newval = newvalue.val.realval;
 							void	   *newextra = newvalue.extra;
 
-							if (*conf->variable != newval ||
+							if (*conf->variable_addr() != newval ||
 								conf->gen.extra != newextra)
 							{
 								if (conf->assign_hook)
 									conf->assign_hook(newval, newextra);
-								*conf->variable = newval;
+								*conf->variable_addr() = newval;
 								set_extra_field(&conf->gen, &conf->gen.extra,
 												newextra);
 								changed = true;
@@ -2426,12 +2420,12 @@ AtEOXact_GUC(bool isCommit, int nestLevel)
 							char	   *newval = newvalue.val.stringval;
 							void	   *newextra = newvalue.extra;
 
-							if (*conf->variable != newval ||
+							if (*conf->variable_addr() != newval ||
 								conf->gen.extra != newextra)
 							{
 								if (conf->assign_hook)
 									conf->assign_hook(newval, newextra);
-								set_string_field(conf, conf->variable, newval);
+								set_string_field(conf, conf->variable_addr(), newval);
 								set_extra_field(&conf->gen, &conf->gen.extra,
 												newextra);
 								changed = true;
@@ -2453,12 +2447,12 @@ AtEOXact_GUC(bool isCommit, int nestLevel)
 							int			newval = newvalue.val.enumval;
 							void	   *newextra = newvalue.extra;
 
-							if (*conf->variable != newval ||
+							if (*conf->variable_addr() != newval ||
 								conf->gen.extra != newextra)
 							{
 								if (conf->assign_hook)
 									conf->assign_hook(newval, newextra);
-								*conf->variable = newval;
+								*conf->variable_addr() = newval;
 								set_extra_field(&conf->gen, &conf->gen.extra,
 												newextra);
 								changed = true;
@@ -3650,7 +3644,7 @@ set_config_option_ext(const char *name, const char *value,
 					if (newextra && !extra_field_used(&conf->gen, newextra))
 						guc_free(newextra);
 
-					if (*conf->variable != newval)
+					if (*conf->variable_addr() != newval)
 					{
 						record->status |= GUC_PENDING_RESTART;
 						ereport(elevel,
@@ -3671,7 +3665,7 @@ set_config_option_ext(const char *name, const char *value,
 
 					if (conf->assign_hook)
 						conf->assign_hook(newval, newextra);
-					*conf->variable = newval;
+					*conf->variable_addr() = newval;
 					set_extra_field(&conf->gen, &conf->gen.extra,
 									newextra);
 					set_guc_source(&conf->gen, source);
@@ -3748,7 +3742,7 @@ set_config_option_ext(const char *name, const char *value,
 					if (newextra && !extra_field_used(&conf->gen, newextra))
 						guc_free(newextra);
 
-					if (*conf->variable != newval)
+					if (*conf->variable_addr() != newval)
 					{
 						record->status |= GUC_PENDING_RESTART;
 						ereport(elevel,
@@ -3769,7 +3763,7 @@ set_config_option_ext(const char *name, const char *value,
 
 					if (conf->assign_hook)
 						conf->assign_hook(newval, newextra);
-					*conf->variable = newval;
+					*conf->variable_addr() = newval;
 					set_extra_field(&conf->gen, &conf->gen.extra,
 									newextra);
 					set_guc_source(&conf->gen, source);
@@ -3846,7 +3840,7 @@ set_config_option_ext(const char *name, const char *value,
 					if (newextra && !extra_field_used(&conf->gen, newextra))
 						guc_free(newextra);
 
-					if (*conf->variable != newval)
+					if (*conf->variable_addr() != newval)
 					{
 						record->status |= GUC_PENDING_RESTART;
 						ereport(elevel,
@@ -3867,7 +3861,7 @@ set_config_option_ext(const char *name, const char *value,
 
 					if (conf->assign_hook)
 						conf->assign_hook(newval, newextra);
-					*conf->variable = newval;
+					*conf->variable_addr() = newval;
 					set_extra_field(&conf->gen, &conf->gen.extra,
 									newextra);
 					set_guc_source(&conf->gen, source);
@@ -3959,9 +3953,9 @@ set_config_option_ext(const char *name, const char *value,
 					bool		newval_different;
 
 					/* newval shouldn't be NULL, so we're a bit sloppy here */
-					newval_different = (*conf->variable == NULL ||
+					newval_different = (*conf->variable_addr() == NULL ||
 										newval == NULL ||
-										strcmp(*conf->variable, newval) != 0);
+										strcmp(*conf->variable_addr(), newval) != 0);
 
 					/* Release newval, unless it's reset_val */
 					if (newval && !string_field_used(conf, newval))
@@ -3991,7 +3985,7 @@ set_config_option_ext(const char *name, const char *value,
 
 					if (conf->assign_hook)
 						conf->assign_hook(newval, newextra);
-					set_string_field(conf, conf->variable, newval);
+					set_string_field(conf, conf->variable_addr(), newval);
 					set_extra_field(&conf->gen, &conf->gen.extra,
 									newextra);
 					set_guc_source(&conf->gen, source);
@@ -4073,7 +4067,7 @@ set_config_option_ext(const char *name, const char *value,
 					if (newextra && !extra_field_used(&conf->gen, newextra))
 						guc_free(newextra);
 
-					if (*conf->variable != newval)
+					if (*conf->variable_addr() != newval)
 					{
 						record->status |= GUC_PENDING_RESTART;
 						ereport(elevel,
@@ -4094,7 +4088,7 @@ set_config_option_ext(const char *name, const char *value,
 
 					if (conf->assign_hook)
 						conf->assign_hook(newval, newextra);
-					*conf->variable = newval;
+					*conf->variable_addr() = newval;
 					set_extra_field(&conf->gen, &conf->gen.extra,
 									newextra);
 					set_guc_source(&conf->gen, source);
@@ -4228,24 +4222,24 @@ GetConfigOption(const char *name, bool missing_ok, bool restrict_privileged)
 	switch (record->vartype)
 	{
 		case PGC_BOOL:
-			return *((struct config_bool *) record)->variable ? "on" : "off";
+			return *((struct config_bool *) record)->variable_addr() ? "on" : "off";
 
 		case PGC_INT:
 			snprintf(buffer, sizeof(buffer), "%d",
-					 *((struct config_int *) record)->variable);
+					 *((struct config_int *) record)->variable_addr());
 			return buffer;
 
 		case PGC_REAL:
 			snprintf(buffer, sizeof(buffer), "%g",
-					 *((struct config_real *) record)->variable);
+					 *((struct config_real *) record)->variable_addr());
 			return buffer;
 
 		case PGC_STRING:
-			return *((struct config_string *) record)->variable;
+			return *((struct config_string *) record)->variable_addr();
 
 		case PGC_ENUM:
 			return config_enum_lookup_by_value((struct config_enum *) record,
-											   *((struct config_enum *) record)->variable);
+											   *((struct config_enum *) record)->variable_addr());
 	}
 	return NULL;
 }
@@ -4846,7 +4840,7 @@ define_custom_variable(struct config_generic *variable)
 
 	/* Now, apply current and stacked values, in the order they were stacked */
 	reapply_stacked_values(variable, pHolder, pHolder->gen.stack,
-						   *(pHolder->variable),
+						   *(pHolder->variable_addr()),
 						   pHolder->gen.scontext, pHolder->gen.source,
 						   pHolder->gen.srole);
 
@@ -4861,7 +4855,7 @@ define_custom_variable(struct config_generic *variable)
 	 * leaked.  Since this can only happen once per session per variable, it
 	 * doesn't seem worth spending much code on.)
 	 */
-	set_string_field(pHolder, pHolder->variable, NULL);
+	set_string_field(pHolder, pHolder->variable_addr(), NULL);
 	set_string_field(pHolder, &pHolder->reset_val, NULL);
 
 	guc_free(pHolder);
@@ -4970,7 +4964,7 @@ void
 DefineCustomBoolVariable(const char *name,
 						 const char *short_desc,
 						 const char *long_desc,
-						 bool *valueAddr,
+						 GucBoolAddressHook addr_hook,
 						 bool bootValue,
 						 GucContext context,
 						 int flags,
@@ -4983,7 +4977,7 @@ DefineCustomBoolVariable(const char *name,
 	var = (struct config_bool *)
 		init_custom_variable(name, short_desc, long_desc, context, flags,
 							 PGC_BOOL, sizeof(struct config_bool));
-	var->variable = valueAddr;
+	var->variable_addr = addr_hook;
 	var->boot_val = bootValue;
 	var->reset_val = bootValue;
 	var->check_hook = check_hook;
@@ -4996,7 +4990,7 @@ void
 DefineCustomIntVariable(const char *name,
 						const char *short_desc,
 						const char *long_desc,
-						int *valueAddr,
+						GucIntAddressHook addr_hook,
 						int bootValue,
 						int minValue,
 						int maxValue,
@@ -5011,7 +5005,7 @@ DefineCustomIntVariable(const char *name,
 	var = (struct config_int *)
 		init_custom_variable(name, short_desc, long_desc, context, flags,
 							 PGC_INT, sizeof(struct config_int));
-	var->variable = valueAddr;
+	var->variable_addr = addr_hook;
 	var->boot_val = bootValue;
 	var->reset_val = bootValue;
 	var->min = minValue;
@@ -5026,7 +5020,7 @@ void
 DefineCustomRealVariable(const char *name,
 						 const char *short_desc,
 						 const char *long_desc,
-						 double *valueAddr,
+						 GucRealAddressHook addr_hook,
 						 double bootValue,
 						 double minValue,
 						 double maxValue,
@@ -5041,7 +5035,7 @@ DefineCustomRealVariable(const char *name,
 	var = (struct config_real *)
 		init_custom_variable(name, short_desc, long_desc, context, flags,
 							 PGC_REAL, sizeof(struct config_real));
-	var->variable = valueAddr;
+	var->variable_addr = addr_hook;
 	var->boot_val = bootValue;
 	var->reset_val = bootValue;
 	var->min = minValue;
@@ -5056,7 +5050,7 @@ void
 DefineCustomStringVariable(const char *name,
 						   const char *short_desc,
 						   const char *long_desc,
-						   char **valueAddr,
+						   GucStringAddressHook addr_hook,
 						   const char *bootValue,
 						   GucContext context,
 						   int flags,
@@ -5069,7 +5063,7 @@ DefineCustomStringVariable(const char *name,
 	var = (struct config_string *)
 		init_custom_variable(name, short_desc, long_desc, context, flags,
 							 PGC_STRING, sizeof(struct config_string));
-	var->variable = valueAddr;
+	var->variable_addr = addr_hook;
 	var->boot_val = bootValue;
 	var->check_hook = check_hook;
 	var->assign_hook = assign_hook;
@@ -5081,7 +5075,7 @@ void
 DefineCustomEnumVariable(const char *name,
 						 const char *short_desc,
 						 const char *long_desc,
-						 int *valueAddr,
+						 GucEnumAddressHook addr_hook,
 						 int bootValue,
 						 const struct config_enum_entry *options,
 						 GucContext context,
@@ -5095,7 +5089,7 @@ DefineCustomEnumVariable(const char *name,
 	var = (struct config_enum *)
 		init_custom_variable(name, short_desc, long_desc, context, flags,
 							 PGC_ENUM, sizeof(struct config_enum));
-	var->variable = valueAddr;
+	var->variable_addr = addr_hook;
 	var->boot_val = bootValue;
 	var->reset_val = bootValue;
 	var->options = options;
@@ -5203,7 +5197,7 @@ get_explain_guc_options(int *num)
 				{
 					struct config_bool *lconf = (struct config_bool *) conf;
 
-					modified = (lconf->boot_val != *(lconf->variable));
+					modified = (lconf->boot_val != *(lconf->variable_addr()));
 				}
 				break;
 
@@ -5211,7 +5205,7 @@ get_explain_guc_options(int *num)
 				{
 					struct config_int *lconf = (struct config_int *) conf;
 
-					modified = (lconf->boot_val != *(lconf->variable));
+					modified = (lconf->boot_val != *(lconf->variable_addr()));
 				}
 				break;
 
@@ -5219,7 +5213,7 @@ get_explain_guc_options(int *num)
 				{
 					struct config_real *lconf = (struct config_real *) conf;
 
-					modified = (lconf->boot_val != *(lconf->variable));
+					modified = (lconf->boot_val != *(lconf->variable_addr()));
 				}
 				break;
 
@@ -5227,7 +5221,7 @@ get_explain_guc_options(int *num)
 				{
 					struct config_string *lconf = (struct config_string *) conf;
 
-					modified = (strcmp(lconf->boot_val, *(lconf->variable)) != 0);
+					modified = (strcmp(lconf->boot_val, *(lconf->variable_addr())) != 0);
 				}
 				break;
 
@@ -5235,7 +5229,7 @@ get_explain_guc_options(int *num)
 				{
 					struct config_enum *lconf = (struct config_enum *) conf;
 
-					modified = (lconf->boot_val != *(lconf->variable));
+					modified = (lconf->boot_val != *(lconf->variable_addr()));
 				}
 				break;
 
@@ -5307,7 +5301,7 @@ ShowGUCOption(struct config_generic *record, bool use_units)
 				if (conf->show_hook)
 					val = conf->show_hook();
 				else
-					val = *conf->variable ? "on" : "off";
+					val = *conf->variable_addr() ? "on" : "off";
 			}
 			break;
 
@@ -5323,7 +5317,7 @@ ShowGUCOption(struct config_generic *record, bool use_units)
 					 * Use int64 arithmetic to avoid overflows in units
 					 * conversion.
 					 */
-					int64		result = *conf->variable;
+					int64		result = *conf->variable_addr();
 					const char *unit;
 
 					if (use_units && result > 0 && (record->flags & GUC_UNIT))
@@ -5348,7 +5342,7 @@ ShowGUCOption(struct config_generic *record, bool use_units)
 					val = conf->show_hook();
 				else
 				{
-					double		result = *conf->variable;
+					double		result = *conf->variable_addr();
 					const char *unit;
 
 					if (use_units && result > 0 && (record->flags & GUC_UNIT))
@@ -5371,8 +5365,8 @@ ShowGUCOption(struct config_generic *record, bool use_units)
 
 				if (conf->show_hook)
 					val = conf->show_hook();
-				else if (*conf->variable && **conf->variable)
-					val = *conf->variable;
+				else if (*conf->variable_addr() && **conf->variable_addr())
+					val = *conf->variable_addr();
 				else
 					val = "";
 			}
@@ -5385,7 +5379,7 @@ ShowGUCOption(struct config_generic *record, bool use_units)
 				if (conf->show_hook)
 					val = conf->show_hook();
 				else
-					val = config_enum_lookup_by_value(conf, *conf->variable);
+					val = config_enum_lookup_by_value(conf, *conf->variable_addr());
 			}
 			break;
 
@@ -5397,7 +5391,6 @@ ShowGUCOption(struct config_generic *record, bool use_units)
 
 	return pstrdup(val);
 }
-
 
 #ifdef EXEC_BACKEND
 
@@ -5712,7 +5705,7 @@ estimate_variable_size(struct config_generic *gconf)
 				 * small values.  Maximum value is 2147483647, i.e. 10 chars.
 				 * Include one byte for sign.
 				 */
-				if (abs(*conf->variable) < 1000)
+				if (abs(*conf->variable_addr()) < 1000)
 					valsize = 3 + 1;
 				else
 					valsize = 10 + 1;
@@ -5740,8 +5733,8 @@ estimate_variable_size(struct config_generic *gconf)
 				 * Although this is not physically the same value, GUC
 				 * generally treats a NULL the same as empty string.
 				 */
-				if (*conf->variable)
-					valsize = strlen(*conf->variable);
+				if (*conf->variable_addr())
+					valsize = strlen(*conf->variable_addr());
 				else
 					valsize = 0;
 			}
@@ -5751,7 +5744,7 @@ estimate_variable_size(struct config_generic *gconf)
 			{
 				struct config_enum *conf = (struct config_enum *) gconf;
 
-				valsize = strlen(config_enum_lookup_by_value(conf, *conf->variable));
+				valsize = strlen(config_enum_lookup_by_value(conf, *conf->variable_addr()));
 			}
 			break;
 	}
@@ -5873,7 +5866,7 @@ serialize_variable(char **destptr, Size *maxbytes,
 				struct config_bool *conf = (struct config_bool *) gconf;
 
 				do_serialize(destptr, maxbytes,
-							 (*conf->variable ? "true" : "false"));
+							 (*conf->variable_addr() ? "true" : "false"));
 			}
 			break;
 
@@ -5881,7 +5874,7 @@ serialize_variable(char **destptr, Size *maxbytes,
 			{
 				struct config_int *conf = (struct config_int *) gconf;
 
-				do_serialize(destptr, maxbytes, "%d", *conf->variable);
+				do_serialize(destptr, maxbytes, "%d", *conf->variable_addr());
 			}
 			break;
 
@@ -5890,7 +5883,7 @@ serialize_variable(char **destptr, Size *maxbytes,
 				struct config_real *conf = (struct config_real *) gconf;
 
 				do_serialize(destptr, maxbytes, "%.*e",
-							 REALTYPE_PRECISION, *conf->variable);
+							 REALTYPE_PRECISION, *conf->variable_addr());
 			}
 			break;
 
@@ -5900,7 +5893,7 @@ serialize_variable(char **destptr, Size *maxbytes,
 
 				/* NULL becomes empty string, see estimate_variable_size() */
 				do_serialize(destptr, maxbytes, "%s",
-							 *conf->variable ? *conf->variable : "");
+							 *conf->variable_addr() ? *conf->variable_addr() : "");
 			}
 			break;
 
@@ -5909,7 +5902,7 @@ serialize_variable(char **destptr, Size *maxbytes,
 				struct config_enum *conf = (struct config_enum *) gconf;
 
 				do_serialize(destptr, maxbytes, "%s",
-							 config_enum_lookup_by_value(conf, *conf->variable));
+							 config_enum_lookup_by_value(conf, *conf->variable_addr()));
 			}
 			break;
 	}
@@ -6114,8 +6107,8 @@ RestoreGUCState(void *gucstate)
 				{
 					struct config_string *conf = (struct config_string *) gconf;
 
-					guc_free(*conf->variable);
-					if (conf->reset_val && conf->reset_val != *conf->variable)
+					guc_free(*conf->variable_addr());
+					if (conf->reset_val && conf->reset_val != *conf->variable_addr())
 						guc_free(conf->reset_val);
 					if (conf->reset_extra && conf->reset_extra != gconf->extra)
 						guc_free(conf->reset_extra);

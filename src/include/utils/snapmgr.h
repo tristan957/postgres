@@ -21,13 +21,13 @@
 
 extern PGDLLIMPORT bool FirstSnapshotSet;
 
-extern PGDLLIMPORT TransactionId TransactionXmin;
-extern PGDLLIMPORT TransactionId RecentXmin;
+extern PGDLLIMPORT session_local TransactionId TransactionXmin;
+extern PGDLLIMPORT session_local TransactionId RecentXmin;
 
 /* Variables representing various special snapshot semantics */
-extern PGDLLIMPORT SnapshotData SnapshotSelfData;
-extern PGDLLIMPORT SnapshotData SnapshotAnyData;
-extern PGDLLIMPORT SnapshotData CatalogSnapshotData;
+extern PGDLLIMPORT session_local SnapshotData SnapshotSelfData;
+extern PGDLLIMPORT session_local SnapshotData SnapshotAnyData;
+extern PGDLLIMPORT session_local SnapshotData CatalogSnapshotData;
 
 #define SnapshotSelf		(&SnapshotSelfData)
 #define SnapshotAny			(&SnapshotAnyData)
