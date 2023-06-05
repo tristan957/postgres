@@ -133,6 +133,7 @@ typedef struct
 	CheckpointerRequest requests[FLEXIBLE_ARRAY_MEMBER];
 } CheckpointerShmemStruct;
 
+#define CheckpointerShmem SHMEM_CheckpointerShmem
 static CheckpointerShmemStruct *CheckpointerShmem;
 
 /* interval for calling AbsorbSyncRequests in CheckpointWriteDelay */

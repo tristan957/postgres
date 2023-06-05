@@ -269,8 +269,10 @@ typedef enum KAXCompressReason
 } KAXCompressReason;
 
 
+#define procArray SHMEM_procArray
 static ProcArrayStruct *procArray;
 
+#define allProcs SHMEM_allProcs
 static PGPROC *allProcs;
 
 /*
@@ -281,7 +283,9 @@ static TransactionId cachedXidIsNotInProgress = InvalidTransactionId;
 /*
  * Bookkeeping for tracking emulated transactions in recovery
  */
+#define KnownAssignedXids SHMEM_KnownAssignedXids
 static TransactionId *KnownAssignedXids;
+#define KnownAssignedXidsValid SHMEM_KnownAssignedXidsValid
 static bool *KnownAssignedXidsValid;
 static TransactionId latestObservedXid = InvalidTransactionId;
 
@@ -448,7 +452,10 @@ CreateSharedProcArray(void)
 		ShmemVariableCache->xactCompletionCount = 1;
 	}
 
-	allProcs = ProcGlobal->allProcs;
+	allProcs =
+#undef allProcs
+		ProcGlobal->allProcs;
+#define allProcs SHMEM_allProcs
 
 	/* Create or attach to the KnownAssignedXids arrays too, if needed */
 	if (EnableHotStandby)

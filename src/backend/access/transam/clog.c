@@ -84,6 +84,7 @@
 /*
  * Link to shared-memory data structures for CLOG control
  */
+#define XactCtlData SHMEM_XactCtlData
 static SlruCtlData XactCtlData;
 
 #define XactCtl (&XactCtlData)

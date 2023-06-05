@@ -198,6 +198,7 @@ typedef struct ReplicationSlotCtlData
 /*
  * Pointers to shared memory
  */
+#define ReplicationSlotCtl SHMEM_ReplicationSlotCtl
 extern PGDLLIMPORT ReplicationSlotCtlData *ReplicationSlotCtl;
 extern PGDLLIMPORT ReplicationSlot *MyReplicationSlot;
 
