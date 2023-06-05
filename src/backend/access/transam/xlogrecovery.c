@@ -60,6 +60,7 @@
 #include "utils/builtins.h"
 #include "utils/datetime.h"
 #include "utils/guc_hooks.h"
+#include "utils/memutils.h"
 #include "utils/pg_lsn.h"
 #include "utils/ps_status.h"
 #include "utils/pg_rusage.h"
@@ -1649,6 +1650,8 @@ PerformWalRecovery(void)
 
 	if (record != NULL)
 	{
+		MemoryContext oldCtx;
+		MemoryContext redoCtx;
 		TimestampTz xtime;
 		PGRUsage	ru0;
 
@@ -1665,6 +1668,10 @@ PerformWalRecovery(void)
 		/* Prepare to report progress of the redo phase. */
 		if (!StandbyMode)
 			begin_startup_progress_phase();
+
+		redoCtx = AllocSetContextCreate(CurrentMemoryContext,
+										"recovery temporary context",
+										ALLOCSET_DEFAULT_SIZES);
 
 		/*
 		 * main redo apply loop
@@ -1743,7 +1750,11 @@ PerformWalRecovery(void)
 			/*
 			 * Apply the record
 			 */
+			oldCtx = MemoryContextSwitchTo(redoCtx);
 			ApplyWalRecord(xlogreader, record, &replayTLI);
+			MemoryContextSwitchTo(oldCtx);
+
+			MemoryContextReset(redoCtx);
 
 			/* Exit loop if we reached inclusive recovery target */
 			if (recoveryStopsAfter(xlogreader))
@@ -1759,6 +1770,8 @@ PerformWalRecovery(void)
 		/*
 		 * end of main redo apply loop
 		 */
+
+		MemoryContextSwitchTo(oldCtx);
 
 		if (reachedRecoveryTarget)
 		{
