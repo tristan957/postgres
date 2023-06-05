@@ -26,9 +26,9 @@
 #define SYNC_METHOD_OPEN_DSYNC	4	/* for O_DSYNC */
 extern PGDLLIMPORT int sync_method;
 
-extern PGDLLIMPORT XLogRecPtr ProcLastRecPtr;
-extern PGDLLIMPORT XLogRecPtr XactLastRecEnd;
-extern PGDLLIMPORT XLogRecPtr XactLastCommitEnd;
+extern PGDLLIMPORT session_local XLogRecPtr ProcLastRecPtr;
+extern PGDLLIMPORT session_local XLogRecPtr XactLastRecEnd;
+extern PGDLLIMPORT session_local XLogRecPtr XactLastCommitEnd;
 
 /* these variables are GUC parameters related to XLOG */
 extern PGDLLIMPORT int wal_segment_size;
@@ -175,7 +175,7 @@ typedef struct CheckpointStatsData
 									 * entire sync phase. */
 } CheckpointStatsData;
 
-extern PGDLLIMPORT CheckpointStatsData CheckpointStats;
+extern PGDLLIMPORT session_local CheckpointStatsData CheckpointStats;
 
 /*
  * GetWALAvailability return codes
