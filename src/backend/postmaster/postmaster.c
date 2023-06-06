@@ -192,7 +192,7 @@ static dlist_head BackendList = DLIST_STATIC_INIT(BackendList);
 static Backend *ShmemBackendArray;
 #endif
 
-BackgroundWorker *MyBgworkerEntry = NULL;
+session_local BackgroundWorker *MyBgworkerEntry = NULL;
 
 
 
