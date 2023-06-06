@@ -20,7 +20,7 @@
  */
 #define NUM_NOTIFY_BUFFERS	8
 
-extern PGDLLIMPORT bool Trace_notify;
+extern PGDLLIMPORT session_guc bool Trace_notify;
 extern PGDLLIMPORT session_local volatile sig_atomic_t notifyInterruptPending;
 
 extern Size AsyncShmemSize(void);

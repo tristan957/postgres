@@ -442,7 +442,7 @@ static session_local bool amRegisteredListener = false;
 static session_local bool tryAdvanceTail = false;
 
 /* GUC parameter */
-bool		Trace_notify = false;
+session_guc bool		Trace_notify = false;
 
 /* local function prototypes */
 static int	asyncQueuePageDiff(int p, int q);

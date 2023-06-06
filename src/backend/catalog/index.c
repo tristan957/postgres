@@ -87,8 +87,8 @@
 #include "utils/tuplesort.h"
 
 /* Potentially set by pg_upgrade_support functions */
-Oid			binary_upgrade_next_index_pg_class_oid = InvalidOid;
-RelFileNumber binary_upgrade_next_index_pg_class_relfilenumber =
+session_local Oid			binary_upgrade_next_index_pg_class_oid = InvalidOid;
+session_local RelFileNumber binary_upgrade_next_index_pg_class_relfilenumber =
 InvalidRelFileNumber;
 
 /*
