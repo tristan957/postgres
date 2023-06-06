@@ -1099,10 +1099,10 @@ PostmasterMain(int argc, char *argv[])
 				(errmsg("could not create I/O completion port for child queue")));
 #endif
 
-#ifdef EXEC_BACKEND
 	/* Write out nondefault GUC settings for child processes to use */
 	write_nondefault_variables(PGC_POSTMASTER);
 
+#ifdef EXEC_BACKEND
 	/*
 	 * Clean out the temp directory used to transmit parameters to child
 	 * processes (see internal_forkexec, below).  We must do this before
@@ -2754,10 +2754,8 @@ process_pm_reload_request(void)
 		}
 #endif
 
-#ifdef EXEC_BACKEND
 		/* Update the starting-point file for future children */
 		write_nondefault_variables(PGC_SIGHUP);
-#endif
 	}
 }
 
@@ -4157,6 +4155,9 @@ BackendStartup(Port *port)
 		/* Close the postmaster's sockets */
 		ClosePostmasterPorts(false);
 
+		/* Read in remaining GUC variables */
+		read_nondefault_variables();
+
 		/* Perform additional initialization and collect startup packet */
 		BackendInitialize(port);
 
@@ -5350,6 +5351,9 @@ StartChildProcess(AuxProcType type)
 		MemoryContextSwitchTo(TopMemoryContext);
 		MemoryContextDelete(PostmasterContext);
 		PostmasterContext = NULL;
+
+		/* Read in remaining GUC variables */
+		read_nondefault_variables();
 
 		AuxiliaryProcessMain(type); /* does not return */
 	}
