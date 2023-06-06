@@ -1363,6 +1363,7 @@ PostmasterMain(int argc, char *argv[])
 	if (external_pid_file)
 	{
 		FILE	   *fpidfile = fopen(external_pid_file, "w");
+		char		errorbuf[PG_STRERROR_R_BUFLEN];
 
 		if (fpidfile)
 		{
@@ -1372,11 +1373,13 @@ PostmasterMain(int argc, char *argv[])
 			/* Make PID file world readable */
 			if (chmod(external_pid_file, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH) != 0)
 				write_stderr("%s: could not change permissions of external PID file \"%s\": %s\n",
-							 progname, external_pid_file, strerror(errno));
+							 progname, external_pid_file,
+							 strerror_r(errno, errorbuf, PG_STRERROR_R_BUFLEN));
 		}
 		else
 			write_stderr("%s: could not write external PID file \"%s\": %s\n",
-						 progname, external_pid_file, strerror(errno));
+						 progname, external_pid_file,
+						 strerror_r(errno, errorbuf, PG_STRERROR_R_BUFLEN));
 
 		on_proc_exit(unlink_external_pid_file, 0);
 	}
@@ -1588,10 +1591,12 @@ checkControlFile(void)
 	fp = AllocateFile(path, PG_BINARY_R);
 	if (fp == NULL)
 	{
+		char		errorbuf[PG_STRERROR_R_BUFLEN];
+
 		write_stderr("%s: could not find the database system\n"
 					 "Expected to find it in the directory \"%s\",\n"
 					 "but could not open file \"%s\": %s\n",
-					 progname, DataDir, path, strerror(errno));
+					 progname, DataDir, path, strerror_r(errno, errorbuf, PG_STRERROR_R_BUFLEN));
 		ExitPostmaster(2);
 	}
 	FreeFile(fp);
@@ -4216,11 +4221,12 @@ report_fork_failure_to_client(Port *port, int errnum)
 {
 	char		buffer[1000];
 	int			rc;
+	char		errorbuf[PG_STRERROR_R_BUFLEN];
 
 	/* Format the error message packet (always V2 protocol) */
 	snprintf(buffer, sizeof(buffer), "E%s%s\n",
 			 _("could not fork new process for connection: "),
-			 strerror(errnum));
+			 strerror_r(errnum, errorbuf, PG_STRERROR_R_BUFLEN));
 
 	/* Set port to non-blocking.  Don't do send() if this fails */
 	if (!pg_set_noblock(port->sock))
@@ -6207,15 +6213,19 @@ read_backend_variables(char *id, Port *port)
 	fp = AllocateFile(id, PG_BINARY_R);
 	if (!fp)
 	{
+		char		errorbuf[PG_STRERROR_R_BUFLEN];
+
 		write_stderr("could not open backend variables file \"%s\": %s\n",
-					 id, strerror(errno));
+					 id, strerror_r(errno, errorbuf, PG_STRERROR_R_BUFLEN));
 		exit(1);
 	}
 
 	if (fread(&param, sizeof(param), 1, fp) != 1)
 	{
+		char		errorbuf[PG_STRERROR_R_BUFLEN];
+
 		write_stderr("could not read from backend variables file \"%s\": %s\n",
-					 id, strerror(errno));
+					 id, strerror_r(errno, errorbuf, PG_STRERROR_R_BUFLEN));
 		exit(1);
 	}
 
@@ -6223,8 +6233,10 @@ read_backend_variables(char *id, Port *port)
 	FreeFile(fp);
 	if (unlink(id) != 0)
 	{
+		char		errorbuf[PG_STRERROR_R_BUFLEN];
+
 		write_stderr("could not remove file \"%s\": %s\n",
-					 id, strerror(errno));
+					 id, strerror_r(errno, errorbuf, PG_STRERROR_R_BUFLEN));
 		exit(1);
 	}
 #else
