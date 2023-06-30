@@ -419,9 +419,7 @@ CheckMyDatabase(const char *name, bool am_superuser, bool override_allow_connect
 						   " which is not recognized by setlocale().", ctype),
 				 errhint("Recreate the database with another locale or install the missing locale.")));
 
-	if (strcmp(ctype, "C") == 0 ||
-		strcmp(ctype, "POSIX") == 0)
-		database_ctype_is_c = true;
+	database_ctype_is_c = locale_is_c(ctype, false);
 
 	if (dbform->datlocprovider == COLLPROVIDER_ICU)
 	{

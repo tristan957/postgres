@@ -24,6 +24,7 @@
 #endif
 
 #include "mb/pg_wchar.h"
+#include "utils/pg_locale.h"
 
 
 /*
@@ -315,8 +316,7 @@ pg_get_encoding_from_locale(const char *ctype, bool write_message)
 		char	   *name;
 
 		/* If locale is C or POSIX, we can allow all encodings */
-		if (pg_strcasecmp(ctype, "C") == 0 ||
-			pg_strcasecmp(ctype, "POSIX") == 0)
+		if (locale_is_c(ctype, true))
 			return PG_SQL_ASCII;
 
 		save = setlocale(LC_CTYPE, NULL);
@@ -353,8 +353,7 @@ pg_get_encoding_from_locale(const char *ctype, bool write_message)
 			return -1;			/* setlocale() broken? */
 
 		/* If locale is C or POSIX, we can allow all encodings */
-		if (pg_strcasecmp(ctype, "C") == 0 ||
-			pg_strcasecmp(ctype, "POSIX") == 0)
+		if (locale_is_c(ctype, true))
 			return PG_SQL_ASCII;
 
 #ifndef WIN32
