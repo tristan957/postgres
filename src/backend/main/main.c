@@ -111,6 +111,16 @@ main(int argc, char *argv[])
 	 * these set to "C" then message localization might not work well in the
 	 * postmaster.
 	 */
+	cache_canonical_locales();
+
+#ifdef HAVE__CONFIGTHREADLOCALE
+	/*
+	 * This call could most likely happen sooner, but just to err on the side of
+	 * caution, call it after absorbing locales from the environment.
+	 */
+	_configthreadlocale(_ENABLE_PER_THREAD_LOCALE);
+#endif
+
 	init_locale("LC_COLLATE", LC_COLLATE, "");
 	init_locale("LC_CTYPE", LC_CTYPE, "");
 
@@ -129,13 +139,6 @@ main(int argc, char *argv[])
 	init_locale("LC_MONETARY", LC_MONETARY, "C");
 	init_locale("LC_NUMERIC", LC_NUMERIC, "C");
 	init_locale("LC_TIME", LC_TIME, "C");
-
-	/*
-	 * Now that we have absorbed as much as we wish to from the locale
-	 * environment, remove any LC_ALL setting, so that the environment
-	 * variables installed by pg_perm_setlocale have force.
-	 */
-	unsetenv("LC_ALL");
 
 	/*
 	 * Catch standard options before doing much else, in particular before we
@@ -298,15 +301,19 @@ startup_hacks(const char *progname)
 
 
 /*
- * Make the initial permanent setting for a locale category.  If that fails,
- * perhaps due to LC_foo=invalid in the environment, use locale C.  If even
- * that fails, perhaps due to out-of-memory, the entire startup fails with it.
- * When this returns, we are guaranteed to have a setting for the given
- * category's environment variable.
+ * Make the initial setting for a locale category.  If that fails, perhaps due
+ * to LC_foo=invalid in the environment, use locale C.  If even that fails,
+ * perhaps due to out-of-memory, the entire startup fails with it.
  */
 static void
 init_locale(const char *categoryname, int category, const char *locale)
 {
+	/*
+	 * Since we are initializing global locales, NULL is an invalid argument.
+	 * NULL just doesn't make sense in this context of initializing locales.
+	 */
+	Assert(locale);
+
 	if (pg_perm_setlocale(category, locale) == NULL &&
 		pg_perm_setlocale(category, "C") == NULL)
 		elog(FATAL, "could not adopt \"%s\" locale nor C locale for %s",

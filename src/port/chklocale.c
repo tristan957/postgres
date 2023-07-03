@@ -24,8 +24,10 @@
 #endif
 
 #include "mb/pg_wchar.h"
-#include "utils/pg_locale.h"
 
+#ifndef FRONTEND
+#include "utils/pg_locale.h"
+#endif
 
 /*
  * This table needs to recognize all the CODESET spellings for supported
@@ -312,13 +314,29 @@ pg_get_encoding_from_locale(const char *ctype, bool write_message)
 	/* Get the CODESET property, and also LC_CTYPE if not passed in */
 	if (ctype)
 	{
+#if !defined(FRONTEND) && HAVE_USELOCALE
+		locale_t	work_locale;
+#else
 		char	   *save;
 		char	   *name;
+#endif
 
 		/* If locale is C or POSIX, we can allow all encodings */
-		if (locale_is_c(ctype, true))
+		if (pg_strcasecmp(ctype, "C") == 0 ||
+			pg_strcasecmp(ctype, "POSIX") == 0)
 			return PG_SQL_ASCII;
 
+#if !defined(FRONTEND) && HAVE_USELOCALE
+		work_locale = newlocale(LC_CTYPE_MASK, ctype, (locale_t) 0);
+		if (work_locale == (locale_t) 0)
+			return -1;
+
+		sys = nl_langinfo_l(CODESET, work_locale);
+		if (sys)
+			sys = strdup(sys);
+
+		freelocale(work_locale);
+#else
 		save = setlocale(LC_CTYPE, NULL);
 		if (!save)
 			return -1;			/* setlocale() broken? */
@@ -334,35 +352,51 @@ pg_get_encoding_from_locale(const char *ctype, bool write_message)
 			return -1;			/* bogus ctype passed in? */
 		}
 
-#ifndef WIN32
+#ifdef WIN32
+		sys = win32_langinfo(name);
+#else
 		sys = nl_langinfo(CODESET);
 		if (sys)
 			sys = strdup(sys);
-#else
-		sys = win32_langinfo(name);
 #endif
 
 		setlocale(LC_CTYPE, save);
 		free(save);
+#endif
 	}
 	else
 	{
+#if !defined(FRONTEND) && HAVE_USELOCALE
+		locale_t	work_locale;
+#endif
+
 		/* much easier... */
+#ifndef FRONTEND
+		ctype = pg_get_locale(LC_CTYPE);
+#else
 		ctype = setlocale(LC_CTYPE, NULL);
+#endif
 		if (!ctype)
 			return -1;			/* setlocale() broken? */
 
 		/* If locale is C or POSIX, we can allow all encodings */
-		if (locale_is_c(ctype, true))
+		if (pg_strcasecmp(ctype, "C") == 0 ||
+			pg_strcasecmp(ctype, "POSIX") == 0)
 			return PG_SQL_ASCII;
 
-#ifndef WIN32
+#if !defined(FRONTEND) && HAVE_USELOCALE
+		work_locale = newlocale(LC_CTYPE_MASK, ctype, (locale_t) 0);
+		if (work_locale == (locale_t) 0)
+			return -1;
+
+		sys = nl_langinfo_l(CODESET, work_locale);
+#elif defined(WIN32)
+		sys = win32_langinfo(name);
+#else
 		sys = nl_langinfo(CODESET);
+#endif
 		if (sys)
 			sys = strdup(sys);
-#else
-		sys = win32_langinfo(ctype);
-#endif
 	}
 
 	if (!sys)
@@ -405,9 +439,23 @@ pg_get_encoding_from_locale(const char *ctype, bool write_message)
 		/* keep newline separate so there's only one translatable string */
 		fputc('\n', stderr);
 #else
+		char	   *canonical;
+
+		/* "" might've been passed in. */
+		canonical = canonicalize_locale(LC_CTYPE, ctype);
+		if (canonical == NULL)
+		{
+			ereport(ERROR,
+					(errmsg("out of memory")));
+
+			return -1;
+		}
+
 		ereport(WARNING,
 				(errmsg("could not determine encoding for locale \"%s\": codeset is \"%s\"",
 						ctype, sys)));
+
+		pfree(canonical);
 #endif
 	}
 

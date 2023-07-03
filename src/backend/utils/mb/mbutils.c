@@ -1238,7 +1238,7 @@ pg_bind_textdomain_codeset(const char *domainname)
 	int			new_msgenc;
 
 #ifndef WIN32
-	if (locale_is_c(locale_ctype, true))
+	if (locale_is_c(pg_get_locale(LC_CTYPE), true))
 #endif
 		if (encoding != PG_SQL_ASCII &&
 			raw_pg_bind_textdomain_codeset(domainname, encoding))
