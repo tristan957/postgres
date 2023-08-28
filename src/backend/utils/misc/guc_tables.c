@@ -550,7 +550,8 @@ session_guc int			tcp_user_timeout;
  * This avoids breaking compatibility with clients that have never supported
  * renegotiation and therefore always try to zero it.
  */
-int			ssl_renegotiation_limit;
+/* Even though this is a PGC_USERSET, it can only ever be 0. */
+dynamic_singleton int			ssl_renegotiation_limit;
 
 /*
  * This really belongs in pg_shmem.c, but is defined here so that it doesn't

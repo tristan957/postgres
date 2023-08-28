@@ -45,7 +45,7 @@
 #include "utils/rel.h"
 #include "utils/relmapper.h"
 
-uint32		bootstrap_data_checksum_version = 0;	/* No checksum */
+dynamic_singleton uint32		bootstrap_data_checksum_version = 0;	/* No checksum */
 
 
 static void CheckerModeMain(void);

@@ -71,10 +71,10 @@ session_local char	   *DataDir = NULL;
  */
 session_local int			data_directory_mode = PG_DIR_MODE_OWNER;
 
-char		OutputFileName[MAXPGPATH];	/* debugging output file */
+dynamic_singleton char		OutputFileName[MAXPGPATH];	/* debugging output file */
 
-char		my_exec_path[MAXPGPATH];	/* full path to my executable */
-char		pkglib_path[MAXPGPATH]; /* full path to lib directory */
+dynamic_singleton char		my_exec_path[MAXPGPATH];	/* full path to my executable */
+dynamic_singleton char		pkglib_path[MAXPGPATH]; /* full path to lib directory */
 
 #ifdef EXEC_BACKEND
 char		postgres_exec_path[MAXPGPATH];	/* full path to backend */
@@ -139,7 +139,7 @@ postmaster_guc int			NBuffers = 16384;
 postmaster_guc int			MaxConnections = 100;
 postmaster_guc int			max_worker_processes = 8;
 session_guc int			max_parallel_workers = 8;
-int			MaxBackends = 0;
+dynamic_singleton int	MaxBackends = 0;
 
 /* GUC parameters for vacuum */
 session_guc int			VacuumBufferUsageLimit = 256;

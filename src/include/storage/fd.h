@@ -71,7 +71,7 @@ extern PGDLLIMPORT int io_direct_flags;
 /*
  * This is private to fd.c, but exported for save/restore_backend_variables()
  */
-extern PGDLLIMPORT int max_safe_fds;
+extern PGDLLIMPORT dynamic_singleton int max_safe_fds;
 
 /*
  * On Windows, we have to interpret EACCES as possibly meaning the same as

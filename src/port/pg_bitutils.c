@@ -113,8 +113,8 @@ static int	pg_popcount64_choose(uint64 word);
 static int	pg_popcount32_fast(uint32 word);
 static int	pg_popcount64_fast(uint64 word);
 
-int			(*pg_popcount32) (uint32 word) = pg_popcount32_choose;
-int			(*pg_popcount64) (uint64 word) = pg_popcount64_choose;
+dynamic_singleton int			(*pg_popcount32) (uint32 word) = pg_popcount32_choose;
+dynamic_singleton int			(*pg_popcount64) (uint64 word) = pg_popcount64_choose;
 #endif							/* TRY_POPCNT_FAST */
 
 #ifdef TRY_POPCNT_FAST

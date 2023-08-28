@@ -300,13 +300,13 @@ pg_ceil_log2_64(uint64 num)
 
 #ifdef TRY_POPCNT_FAST
 /* Attempt to use the POPCNT instruction, but perform a runtime check first */
-extern int	(*pg_popcount32) (uint32 word);
-extern int	(*pg_popcount64) (uint64 word);
+extern dynamic_singleton int	(*pg_popcount32) (uint32 word);
+extern dynamic_singleton int	(*pg_popcount64) (uint64 word);
 
 #else
 /* Use a portable implementation -- no need for a function pointer. */
-extern int	pg_popcount32(uint32 word);
-extern int	pg_popcount64(uint64 word);
+extern dynamic_singleton int	pg_popcount32(uint32 word);
+extern dynamic_singleton int	pg_popcount64(uint64 word);
 
 #endif							/* TRY_POPCNT_FAST */
 

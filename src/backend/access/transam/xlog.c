@@ -108,7 +108,7 @@
 #include "utils/timestamp.h"
 #include "utils/varlena.h"
 
-extern uint32 bootstrap_data_checksum_version;
+extern dynamic_singleton uint32 bootstrap_data_checksum_version;
 
 /* timeline ID to be used when bootstrapping */
 #define BootstrapTimeLineID		1

@@ -176,7 +176,7 @@ extern PGDLLIMPORT session_local char *DataDir;
 extern PGDLLIMPORT session_local int data_directory_mode;
 
 extern PGDLLIMPORT postmaster_guc int NBuffers;
-extern PGDLLIMPORT int MaxBackends;
+extern PGDLLIMPORT dynamic_singleton int MaxBackends;
 extern PGDLLIMPORT postmaster_guc int MaxConnections;
 extern PGDLLIMPORT postmaster_guc int max_worker_processes;
 extern PGDLLIMPORT session_guc int max_parallel_workers;
@@ -189,9 +189,9 @@ extern PGDLLIMPORT session_local struct Latch *MyLatch;
 extern PGDLLIMPORT session_local int32 MyCancelKey;
 extern PGDLLIMPORT session_local int MyPMChildSlot;
 
-extern PGDLLIMPORT char OutputFileName[];
-extern PGDLLIMPORT char my_exec_path[];
-extern PGDLLIMPORT char pkglib_path[];
+extern PGDLLIMPORT dynamic_singleton char OutputFileName[];
+extern PGDLLIMPORT dynamic_singleton char my_exec_path[];
+extern PGDLLIMPORT dynamic_singleton char pkglib_path[];
 
 #ifdef EXEC_BACKEND
 extern PGDLLIMPORT char postgres_exec_path[];

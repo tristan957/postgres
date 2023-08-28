@@ -43,14 +43,14 @@
 session_guc int			extra_float_digits = 1;
 
 /* Cached constants for degree-based trig functions */
-static bool degree_consts_set = false;
-static float8 sin_30 = 0;
-static float8 one_minus_cos_60 = 0;
-static float8 asin_0_5 = 0;
-static float8 acos_0_5 = 0;
-static float8 atan_1_0 = 0;
-static float8 tan_45 = 0;
-static float8 cot_45 = 0;
+static dynamic_singleton bool degree_consts_set = false;
+static dynamic_singleton float8 sin_30 = 0;
+static dynamic_singleton float8 one_minus_cos_60 = 0;
+static dynamic_singleton float8 asin_0_5 = 0;
+static dynamic_singleton float8 acos_0_5 = 0;
+static dynamic_singleton float8 atan_1_0 = 0;
+static dynamic_singleton float8 tan_45 = 0;
+static dynamic_singleton float8 cot_45 = 0;
 
 /*
  * These are intentionally not static; don't "fix" them.  They will never
