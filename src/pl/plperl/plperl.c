@@ -230,8 +230,8 @@ static PerlInterpreter *plperl_held_interp = NULL;
 /* GUC variables */
 static bool plperl_use_strict = false;
 static char *plperl_on_init = NULL;
-static char *plperl_on_plperl_init = NULL;
-static char *plperl_on_plperlu_init = NULL;
+static suset_guc char *plperl_on_plperl_init = NULL;
+static suset_guc char *plperl_on_plperlu_init = NULL;
 
 static bool plperl_ending = false;
 static OP  *(*pp_require_orig) (pTHX) = NULL;

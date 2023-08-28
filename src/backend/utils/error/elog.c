@@ -117,7 +117,7 @@ sighup_guc bool		syslog_sequence_numbers = true;
 sighup_guc bool		syslog_split_messages = true;
 
 /* Processed form of backtrace_symbols GUC */
-static char *backtrace_symbol_list;
+static suset_guc char *backtrace_symbol_list;
 
 #ifdef HAVE_SYSLOG
 
