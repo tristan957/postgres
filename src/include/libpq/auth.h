@@ -26,7 +26,7 @@ extern void sendAuthRequest(Port *port, AuthRequest areq, const char *extradata,
 
 /* Hook for plugins to get control in ClientAuthentication() */
 typedef void (*ClientAuthentication_hook_type) (Port *, int);
-extern PGDLLIMPORT ClientAuthentication_hook_type ClientAuthentication_hook;
+extern PGDLLIMPORT session_local ClientAuthentication_hook_type ClientAuthentication_hook;
 
 /* hook type for password manglers */
 typedef char *(*auth_password_hook_typ) (char *input);

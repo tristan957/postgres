@@ -184,7 +184,7 @@ static session_local bool streamingDoneReceiving;
 static session_local bool WalSndCaughtUp = false;
 
 /* Flags set by signal handlers for later service in main loop */
-static volatile sig_atomic_t got_SIGUSR2 = false;
+static session_local volatile sig_atomic_t got_SIGUSR2 = false;
 static session_local volatile sig_atomic_t got_STOPPING = false;
 
 /*

@@ -21,7 +21,7 @@
 global BufferDescPadded *BufferDescriptors;
 global char	   *BufferBlocks;
 global ConditionVariableMinimallyPadded *BufferIOCVArray;
-WritebackContext BackendWritebackContext;
+session_local WritebackContext BackendWritebackContext;
 global CkptSortItem *CkptBufferIds;
 
 

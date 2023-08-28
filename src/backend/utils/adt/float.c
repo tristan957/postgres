@@ -65,8 +65,8 @@ static_singleton float8		degree_c_one_half = 0.5;
 static_singleton float8		degree_c_one = 1.0;
 
 /* State for drandom() and setseed() */
-static bool drandom_seed_set = false;
-static pg_prng_state drandom_seed;
+static session_local bool drandom_seed_set = false;
+static session_local pg_prng_state drandom_seed;
 
 /* Local function prototypes */
 static double sind_q1(double x);

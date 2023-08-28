@@ -64,7 +64,7 @@
 
 global slock_t				dummy_spinlock;
 
-static int	spins_per_delay = DEFAULT_SPINS_PER_DELAY;
+static session_local int	spins_per_delay = DEFAULT_SPINS_PER_DELAY;
 
 
 /*

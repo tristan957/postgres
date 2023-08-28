@@ -98,7 +98,7 @@ typedef struct
 	((flags) &= ~(((uint32) 1) << (uint32) (type)))
 
 static global ProcSignalHeader *ProcSignal = NULL;
-static ProcSignalSlot *MyProcSignalSlot = NULL;
+static session_local ProcSignalSlot *MyProcSignalSlot = NULL;
 
 static bool CheckProcSignal(ProcSignalReason reason);
 static void CleanupProcSignalState(int status, Datum arg);

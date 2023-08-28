@@ -126,7 +126,7 @@ static session_local long max_stack_depth_bytes = 100 * 1024L;
  * Stack base pointer -- initialized by PostmasterMain and inherited by
  * subprocesses (but see also InitPostmasterChild).
  */
-static char *stack_base_ptr = NULL;
+static session_local char *stack_base_ptr = NULL;
 
 /*
  * Flag to keep track of whether we have started a transaction.
@@ -156,9 +156,9 @@ static session_local bool ignore_till_sync = false;
 static session_local CachedPlanSource *unnamed_stmt_psrc = NULL;
 
 /* assorted command-line switches */
-static const char *userDoption = NULL;	/* -D switch */
-static bool EchoQuery = false;	/* -E switch */
-static bool UseSemiNewlineNewline = false;	/* -j switch */
+static session_local const char *userDoption = NULL;	/* -D switch */
+static session_local bool EchoQuery = false;	/* -E switch */
+static session_local bool UseSemiNewlineNewline = false;	/* -j switch */
 
 /* whether or not, and why, we were canceled by conflict with recovery */
 static session_local bool RecoveryConflictPending = false;
@@ -4943,8 +4943,8 @@ get_stack_depth_rlimit(void)
 }
 
 
-static struct rusage Save_r;
-static struct timeval Save_t;
+static session_local struct rusage Save_r;
+static session_local struct timeval Save_t;
 
 void
 ResetUsage(void)

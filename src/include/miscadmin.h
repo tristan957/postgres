@@ -163,8 +163,8 @@ do { \
  */
 #ifndef FRONTEND
 extern PGDLLIMPORT global pid_t PostmasterPid;
-extern PGDLLIMPORT bool IsPostmasterEnvironment;
-extern PGDLLIMPORT bool IsUnderPostmaster;
+extern PGDLLIMPORT session_local bool IsPostmasterEnvironment;
+extern PGDLLIMPORT session_local bool IsUnderPostmaster;
 extern PGDLLIMPORT session_local bool IsBackgroundWorker;
 extern PGDLLIMPORT bool IsBinaryUpgrade;
 
@@ -423,7 +423,7 @@ typedef enum ProcessingMode
 	NormalProcessing			/* normal processing */
 } ProcessingMode;
 
-extern PGDLLIMPORT ProcessingMode Mode;
+extern PGDLLIMPORT session_local ProcessingMode Mode;
 
 #define IsBootstrapProcessingMode() (Mode == BootstrapProcessing)
 #define IsInitProcessingMode()		(Mode == InitProcessing)
@@ -461,7 +461,7 @@ typedef enum
 	NUM_AUXPROCTYPES			/* Must be last! */
 } AuxProcType;
 
-extern PGDLLIMPORT AuxProcType MyAuxProcType;
+extern PGDLLIMPORT session_local AuxProcType MyAuxProcType;
 
 #define AmStartupProcess()			(MyAuxProcType == StartupProcess)
 #define AmBackgroundWriterProcess() (MyAuxProcType == BgWriterProcess)
@@ -487,7 +487,7 @@ extern void InitPostgres(const char *in_dbname, Oid dboid,
 extern void BaseInit(void);
 
 /* in utils/init/miscinit.c */
-extern PGDLLIMPORT bool IgnoreSystemIndexes;
+extern PGDLLIMPORT bool session_local IgnoreSystemIndexes;
 extern PGDLLIMPORT bool process_shared_preload_libraries_in_progress;
 extern PGDLLIMPORT bool process_shared_preload_libraries_done;
 extern PGDLLIMPORT bool process_shmem_requests_in_progress;
@@ -509,7 +509,7 @@ extern void pg_bindtextdomain(const char *domain);
 extern bool has_rolreplication(Oid roleid);
 
 typedef void (*shmem_request_hook_type) (void);
-extern PGDLLIMPORT shmem_request_hook_type shmem_request_hook;
+extern PGDLLIMPORT session_local shmem_request_hook_type shmem_request_hook;
 
 extern Size EstimateClientConnectionInfoSpace(void);
 extern void SerializeClientConnectionInfo(Size maxsize, char *start_address);

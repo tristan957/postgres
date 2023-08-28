@@ -218,7 +218,7 @@ static session_local MemoryContext pgStatPendingContext = NULL;
  * Newly pending entries should only ever be added to the end of the list,
  * otherwise pgstat_flush_pending_entries() might not see them immediately.
  */
-static dlist_head pgStatPending = DLIST_STATIC_INIT(pgStatPending);
+static /* FIXME: session_local */ dlist_head pgStatPending = DLIST_STATIC_INIT(pgStatPending);
 
 
 /*

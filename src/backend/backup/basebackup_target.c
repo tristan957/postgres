@@ -50,7 +50,7 @@ static static_singleton BaseBackupTargetType builtin_backup_targets[] =
 	}
 };
 
-static List *BaseBackupTargetTypeList = NIL;
+static session_local List *BaseBackupTargetTypeList = NIL;
 
 /*
  * Add a new base backup target type.

@@ -58,14 +58,14 @@
 
 #define DIRECTORY_LOCK_FILE		"postmaster.pid"
 
-ProcessingMode Mode = InitProcessing;
+session_local ProcessingMode Mode = InitProcessing;
 
 session_local BackendType MyBackendType;
 
 /* List of lock files to be removed at proc exit */
 static global List *lock_files = NIL;
 
-static Latch LocalLatchData;
+static session_local Latch LocalLatchData;
 
 /* ----------------------------------------------------------------
  *		ignoring system indexes support stuff
@@ -77,7 +77,7 @@ static Latch LocalLatchData;
  * ----------------------------------------------------------------
  */
 
-bool		IgnoreSystemIndexes = false;
+session_local bool		IgnoreSystemIndexes = false;
 
 
 /* ----------------------------------------------------------------
@@ -993,7 +993,7 @@ GetUserNameFromId(Oid roleid, bool noerr)
  *-------------------------------------------------------------------------
  */
 
-ClientConnectionInfo MyClientConnectionInfo;
+session_local ClientConnectionInfo MyClientConnectionInfo;
 
 /*
  * Intermediate representation of ClientConnectionInfo for easier
@@ -1764,7 +1764,7 @@ char	   *local_preload_libraries_string = NULL;
 bool		process_shared_preload_libraries_in_progress = false;
 bool		process_shared_preload_libraries_done = false;
 
-shmem_request_hook_type shmem_request_hook = NULL;
+session_local shmem_request_hook_type shmem_request_hook = NULL;
 bool		process_shmem_requests_in_progress = false;
 
 /*

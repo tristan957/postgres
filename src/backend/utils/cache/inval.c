@@ -253,7 +253,7 @@ session_guc int			debug_discard_caches = 0;
 #define MAX_SYSCACHE_CALLBACKS 64
 #define MAX_RELCACHE_CALLBACKS 10
 
-static struct SYSCACHECALLBACK
+static session_local struct SYSCACHECALLBACK
 {
 	int16		id;				/* cache number */
 	int16		link;			/* next callback index+1 for same cache */
@@ -265,7 +265,7 @@ static session_local int16 syscache_callback_links[SysCacheSize];
 
 static session_local int	syscache_callback_count = 0;
 
-static struct RELCACHECALLBACK
+static session_local struct RELCACHECALLBACK
 {
 	RelcacheCallbackFunction function;
 	Datum		arg;

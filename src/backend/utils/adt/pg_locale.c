@@ -1402,7 +1402,7 @@ lc_ctype_is_c(Oid collation)
 	return (lookup_collation_cache(collation, true))->ctype_is_c;
 }
 
-struct pg_locale_struct default_locale;
+session_local struct pg_locale_struct default_locale;
 
 void
 make_icu_collator(const char *iculocstr,

@@ -89,7 +89,7 @@ static session_local bool		createrole_self_grant_enabled = false;
 static session_local GrantRoleOptions createrole_self_grant_options;
 
 /* Hook to check passwords in CreateRole() and AlterRole() */
-check_password_hook_type check_password_hook = NULL;
+session_local check_password_hook_type check_password_hook = NULL;
 
 static void AddRoleMems(Oid currentUserId, const char *rolename, Oid roleid,
 						List *memberSpecs, List *memberIds,

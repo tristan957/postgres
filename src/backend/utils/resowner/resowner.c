@@ -159,7 +159,7 @@ typedef struct ResourceReleaseCallbackItem
 	void	   *arg;
 } ResourceReleaseCallbackItem;
 
-static ResourceReleaseCallbackItem *ResourceRelease_callbacks = NULL;
+static session_local ResourceReleaseCallbackItem *ResourceRelease_callbacks = NULL;
 
 
 /* Internal routines */

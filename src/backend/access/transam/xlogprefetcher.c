@@ -79,7 +79,7 @@ int			recovery_prefetch = RECOVERY_PREFETCH_TRY;
 #define RecoveryPrefetchEnabled() false
 #endif
 
-static int	XLogPrefetchReconfigureCount = 0;
+static session_local int	XLogPrefetchReconfigureCount = 0;
 
 /*
  * Enum used to report whether an IO should be started.

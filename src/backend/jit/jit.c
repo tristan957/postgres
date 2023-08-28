@@ -40,9 +40,9 @@ session_guc double		jit_above_cost = 100000;
 session_guc double		jit_inline_above_cost = 500000;
 session_guc double		jit_optimize_above_cost = 500000;
 
-static JitProviderCallbacks provider;
-static bool provider_successfully_loaded = false;
-static bool provider_failed_loading = false;
+static session_local JitProviderCallbacks provider;
+static session_local bool provider_successfully_loaded = false;
+static session_local bool provider_failed_loading = false;
 
 
 static bool provider_init(void);

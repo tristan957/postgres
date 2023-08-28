@@ -307,7 +307,7 @@ static session_local GlobalVisState GlobalVisTempRels;
  * recomputed, or InvalidTransactionId if it has not. Used to limit how many
  * times accurate horizons are recomputed. See GlobalVisTestShouldUpdate().
  */
-static TransactionId ComputeXidHorizonsResultLastXmin;
+static session_local TransactionId ComputeXidHorizonsResultLastXmin;
 
 #ifdef XIDCACHE_DEBUG
 

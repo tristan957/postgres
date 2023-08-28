@@ -95,7 +95,7 @@
 /* Global variables */
 session_local ErrorContextCallback *error_context_stack = NULL;
 
-sigjmp_buf *PG_exception_stack = NULL;
+session_local sigjmp_buf *PG_exception_stack = NULL;
 
 extern bool redirection_done;
 
@@ -106,7 +106,7 @@ extern bool redirection_done;
  * libraries will miss any log messages that are generated before the
  * library is loaded.
  */
-emit_log_hook_type emit_log_hook = NULL;
+session_local emit_log_hook_type emit_log_hook = NULL;
 
 /* GUC parameters */
 session_guc int			Log_error_verbosity = PGERROR_DEFAULT;
@@ -132,7 +132,7 @@ static suset_guc char *backtrace_symbol_list;
 #define PG_SYSLOG_LIMIT 900
 #endif
 
-static bool openlog_done = false;
+static session_local bool openlog_done = false;
 static char *syslog_ident = NULL;
 static int	syslog_facility = LOG_LOCAL0;
 
@@ -1621,8 +1621,8 @@ getinternalerrposition(void)
  * The result of format_elog_string() is stored in ErrorContext, and will
  * therefore survive until FlushErrorState() is called.
  */
-static int	save_format_errnumber;
-static const char *save_format_domain;
+static session_local int	save_format_errnumber;
+static session_local const char *save_format_domain;
 
 void
 pre_format_elog_string(int errnumber, const char *domain)

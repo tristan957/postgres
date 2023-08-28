@@ -104,7 +104,7 @@ static inline dsm_handle make_main_region_dsm_handle(int slot);
 static inline bool is_main_region_dsm_handle(dsm_handle handle);
 
 /* Has this backend initialized the dynamic shared memory system yet? */
-static bool dsm_init_done = false;
+static session_local bool dsm_init_done = false;
 
 /* Preallocated DSM space in the main shared memory region. */
 static global void *dsm_main_space_begin = NULL;
@@ -126,7 +126,7 @@ static global void *dsm_main_space_begin = NULL;
  * each new mapping would require an update to the control segment,
  * which requires locking, in which the postmaster must not be involved.
  */
-static dlist_head dsm_segment_list = DLIST_STATIC_INIT(dsm_segment_list);
+static /* FIXME: session_local */ dlist_head dsm_segment_list = DLIST_STATIC_INIT(dsm_segment_list);
 
 /*
  * Control segment information.

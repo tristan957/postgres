@@ -89,7 +89,7 @@ struct pg_locale_struct
 
 typedef struct pg_locale_struct *pg_locale_t;
 
-extern PGDLLIMPORT struct pg_locale_struct default_locale;
+extern PGDLLIMPORT session_local struct pg_locale_struct default_locale;
 
 extern void make_icu_collator(const char *iculocstr,
 							  const char *icurules,

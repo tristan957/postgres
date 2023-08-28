@@ -19,7 +19,7 @@
 #include "utils/snapshot.h"
 
 
-extern PGDLLIMPORT bool FirstSnapshotSet;
+extern PGDLLIMPORT session_local bool FirstSnapshotSet;
 
 extern PGDLLIMPORT session_local TransactionId TransactionXmin;
 extern PGDLLIMPORT session_local TransactionId RecentXmin;

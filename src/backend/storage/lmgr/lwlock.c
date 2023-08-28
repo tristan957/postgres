@@ -201,8 +201,8 @@ StaticAssertDecl(lengthof(BuiltinTrancheNames) ==
  * stores the names of all dynamically-created tranches known to the current
  * process.  Any unused entries in the array will contain NULL.
  */
-static const char **LWLockTrancheNames = NULL;
-static int	LWLockTrancheNamesAllocated = 0;
+static session_local const char **LWLockTrancheNames = NULL;
+static session_local int	LWLockTrancheNamesAllocated = 0;
 
 /*
  * This points to the main array of LWLocks in shared memory.  Backends inherit
@@ -236,8 +236,8 @@ typedef struct NamedLWLockTrancheRequest
 	int			num_lwlocks;
 } NamedLWLockTrancheRequest;
 
-static NamedLWLockTrancheRequest *NamedLWLockTrancheRequestArray = NULL;
-static int	NamedLWLockTrancheRequestsAllocated = 0;
+static session_local NamedLWLockTrancheRequest *NamedLWLockTrancheRequestArray = NULL;
+static session_local int	NamedLWLockTrancheRequestsAllocated = 0;
 
 /*
  * NamedLWLockTrancheRequests is both the valid length of the request array,
@@ -245,7 +245,7 @@ static int	NamedLWLockTrancheRequestsAllocated = 0;
  * This variable and NamedLWLockTrancheArray are non-static so that
  * postmaster.c can copy them to child processes in EXEC_BACKEND builds.
  */
-int			NamedLWLockTrancheRequests = 0;
+session_local int			NamedLWLockTrancheRequests = 0;
 
 /* points to data in shared memory: */
 global NamedLWLockTranche *NamedLWLockTrancheArray = NULL;

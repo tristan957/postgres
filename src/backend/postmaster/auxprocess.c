@@ -42,7 +42,7 @@ static void ShutdownAuxiliaryProcess(int code, Datum arg);
  * ----------------
  */
 
-AuxProcType MyAuxProcType = NotAnAuxProcess;	/* declared in miscadmin.h */
+session_local AuxProcType MyAuxProcType = NotAnAuxProcess;	/* declared in miscadmin.h */
 
 
 /*

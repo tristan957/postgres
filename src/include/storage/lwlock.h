@@ -80,7 +80,7 @@ typedef struct NamedLWLockTranche
 } NamedLWLockTranche;
 
 extern PGDLLIMPORT global NamedLWLockTranche *NamedLWLockTrancheArray;
-extern PGDLLIMPORT int NamedLWLockTrancheRequests;
+extern PGDLLIMPORT session_local int NamedLWLockTrancheRequests;
 
 /* Names for fixed lwlocks */
 #include "storage/lwlocknames.h"

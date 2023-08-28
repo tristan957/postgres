@@ -78,7 +78,7 @@ typedef struct xl_invalid_page
 	bool		present;		/* page existed but contained zeroes */
 } xl_invalid_page;
 
-static HTAB *invalid_page_tab = NULL;
+static session_local HTAB *invalid_page_tab = NULL;
 
 static int	read_local_xlog_page_guts(XLogReaderState *state, XLogRecPtr targetPagePtr,
 									  int reqLen, XLogRecPtr targetRecPtr,

@@ -80,12 +80,12 @@ NON_EXEC_STATIC global PGPROC *AuxiliaryProcs = NULL;
 global PGPROC	   *PreparedXactProcs = NULL;
 
 /* If we are waiting for a lock, this points to the associated LOCALLOCK */
-static LOCALLOCK *lockAwaited = NULL;
+static session_local LOCALLOCK *lockAwaited = NULL;
 
-static DeadLockState deadlock_state = DS_NOT_YET_CHECKED;
+static session_local DeadLockState deadlock_state = DS_NOT_YET_CHECKED;
 
 /* Is a deadlock check pending? */
-static volatile sig_atomic_t got_deadlock_timeout;
+static session_local volatile sig_atomic_t got_deadlock_timeout;
 
 static void RemoveProcFromArray(int code, Datum arg);
 static void ProcKill(int code, Datum arg);

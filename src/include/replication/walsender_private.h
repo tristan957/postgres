@@ -132,6 +132,6 @@ extern void replication_scanner_init(const char *str);
 extern void replication_scanner_finish(void);
 extern bool replication_scanner_is_replication_command(void);
 
-extern PGDLLIMPORT Node *replication_parse_result;
+extern PGDLLIMPORT session_local Node *replication_parse_result;
 
 #endif							/* _WALSENDER_PRIVATE_H */

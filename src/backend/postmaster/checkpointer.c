@@ -148,15 +148,15 @@ double		CheckPointCompletionTarget = 0.9;
 /*
  * Private state
  */
-static bool ckpt_active = false;
+static session_local bool ckpt_active = false;
 
 /* these values are valid when ckpt_active is true: */
-static pg_time_t ckpt_start_time;
-static XLogRecPtr ckpt_start_recptr;
-static double ckpt_cached_elapsed;
+static session_local pg_time_t ckpt_start_time;
+static session_local XLogRecPtr ckpt_start_recptr;
+static session_local double ckpt_cached_elapsed;
 
-static pg_time_t last_checkpoint_time;
-static pg_time_t last_xlog_switch_time;
+static session_local pg_time_t last_checkpoint_time;
+static session_local pg_time_t last_xlog_switch_time;
 
 /* Prototypes for private functions */
 

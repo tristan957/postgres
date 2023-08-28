@@ -229,7 +229,7 @@ static int	PerformRadiusTransaction(const char *server, const char *secret, cons
  * but before the user has been informed about the results.  It could be used
  * to record login events, insert a delay after failed authentication, etc.
  */
-ClientAuthentication_hook_type ClientAuthentication_hook = NULL;
+session_local ClientAuthentication_hook_type ClientAuthentication_hook = NULL;
 
 /*
  * Tell the user the authentication failed, but not (much about) why.

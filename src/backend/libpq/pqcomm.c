@@ -135,7 +135,7 @@ static static_singleton const PQcommMethods PqCommSocketMethods = {
 
 static_singleton const PQcommMethods *PqCommMethods = &PqCommSocketMethods;
 
-WaitEventSet *FeBeWaitSet;
+session_local WaitEventSet *FeBeWaitSet;
 
 
 /* --------------------------------

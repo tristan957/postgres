@@ -91,10 +91,10 @@ static static_singleton const dshash_parameters dsh_params = {
 	LWTRANCHE_LAUNCHER_HASH
 };
 
-static dsa_area *last_start_times_dsa = NULL;
-static dshash_table *last_start_times = NULL;
+static session_local dsa_area *last_start_times_dsa = NULL;
+static session_local dshash_table *last_start_times = NULL;
 
-static bool on_commit_launcher_wakeup = false;
+static session_local bool on_commit_launcher_wakeup = false;
 
 
 static void ApplyLauncherWakeup(void);

@@ -355,7 +355,7 @@ static global SerialControl serialControl;
  * collapsing duplicate targets.  When a duplicate is found, the later
  * commitSeqNo is used.
  */
-static SERIALIZABLEXACT *OldCommittedSxact;
+static session_local SERIALIZABLEXACT *OldCommittedSxact;
 
 
 /*

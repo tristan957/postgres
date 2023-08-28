@@ -293,7 +293,7 @@ typedef enum
 } TransApplyAction;
 
 /* errcontext tracker */
-static ApplyErrorCallbackArg apply_error_callback_arg =
+static session_local ApplyErrorCallbackArg apply_error_callback_arg =
 {
 	.command = 0,
 	.rel = NULL,

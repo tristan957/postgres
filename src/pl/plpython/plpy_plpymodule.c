@@ -20,7 +20,7 @@
 #include "utils/builtins.h"
 #include "utils/snapmgr.h"
 
-HTAB	   *PLy_spi_exceptions = NULL;
+session_local HTAB	   *PLy_spi_exceptions = NULL;
 
 
 static void PLy_add_exceptions(PyObject *plpy);

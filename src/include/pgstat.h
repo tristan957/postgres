@@ -753,18 +753,18 @@ extern PGDLLIMPORT global PgStat_CheckpointerStats PendingCheckpointerStats;
  */
 
 /* Updated by pgstat_count_buffer_*_time macros */
-extern PGDLLIMPORT PgStat_Counter pgStatBlockReadTime;
-extern PGDLLIMPORT PgStat_Counter pgStatBlockWriteTime;
+extern PGDLLIMPORT session_local PgStat_Counter pgStatBlockReadTime;
+extern PGDLLIMPORT session_local PgStat_Counter pgStatBlockWriteTime;
 
 /*
  * Updated by pgstat_count_conn_*_time macros, called by
  * pgstat_report_activity().
  */
-extern PGDLLIMPORT PgStat_Counter pgStatActiveTime;
-extern PGDLLIMPORT PgStat_Counter pgStatTransactionIdleTime;
+extern PGDLLIMPORT session_local PgStat_Counter pgStatActiveTime;
+extern PGDLLIMPORT session_local PgStat_Counter pgStatTransactionIdleTime;
 
 /* updated by the traffic cop and in errfinish() */
-extern PGDLLIMPORT SessionEndType pgStatSessionEndCause;
+extern PGDLLIMPORT session_local SessionEndType pgStatSessionEndCause;
 
 
 /*
@@ -772,7 +772,7 @@ extern PGDLLIMPORT SessionEndType pgStatSessionEndCause;
  */
 
 /* updated directly by backends and background processes */
-extern PGDLLIMPORT PgStat_PendingWalStats PendingWalStats;
+extern PGDLLIMPORT session_local PgStat_PendingWalStats PendingWalStats;
 
 
 #endif							/* PGSTAT_H */

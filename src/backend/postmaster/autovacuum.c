@@ -152,7 +152,7 @@ static session_local double av_storage_param_cost_delay = -1;
 static session_local int	av_storage_param_cost_limit = -1;
 
 /* Flags set by signal handlers */
-static volatile sig_atomic_t got_SIGUSR2 = false;
+static session_local volatile sig_atomic_t got_SIGUSR2 = false;
 
 /* Comparison points for determining whether freeze_max_age is exceeded */
 static session_local TransactionId recentXid;

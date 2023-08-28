@@ -92,23 +92,23 @@ int			wal_receiver_timeout;
 bool		hot_standby_feedback;
 
 /* libpqwalreceiver connection */
-static WalReceiverConn *wrconn = NULL;
-WalReceiverFunctionsType *WalReceiverFunctions = NULL;
+static session_local WalReceiverConn *wrconn = NULL;
+session_local WalReceiverFunctionsType *WalReceiverFunctions = NULL;
 
 /*
  * These variables are used similarly to openLogFile/SegNo,
  * but for walreceiver to write the XLOG. recvFileTLI is the TimeLineID
  * corresponding the filename of recvFile.
  */
-static int	recvFile = -1;
-static TimeLineID recvFileTLI = 0;
-static XLogSegNo recvSegNo = 0;
+static session_local int	recvFile = -1;
+static session_local TimeLineID recvFileTLI = 0;
+static session_local XLogSegNo recvSegNo = 0;
 
 /*
  * LogstreamResult indicates the byte positions that we have already
  * written/fsynced.
  */
-static struct
+static session_local struct
 {
 	XLogRecPtr	Write;			/* last byte + 1 written out in the standby */
 	XLogRecPtr	Flush;			/* last byte + 1 flushed in the standby */

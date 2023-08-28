@@ -45,7 +45,7 @@ session_local Oid			binary_upgrade_next_pg_enum_oid = InvalidOid;
  * created during CREATE TYPE, so they can't go away unless the enum type
  * itself does.
  */
-static HTAB *uncommitted_enums = NULL;
+static session_local HTAB *uncommitted_enums = NULL;
 
 static void RenumberEnumType(Relation pg_enum, HeapTuple *existing, int nelems);
 static int	sort_order_cmp(const void *p1, const void *p2);

@@ -153,9 +153,9 @@ typedef struct ReplicationStateCtl
 } ReplicationStateCtl;
 
 /* external variables */
-RepOriginId replorigin_session_origin = InvalidRepOriginId; /* assumed identity */
-XLogRecPtr	replorigin_session_origin_lsn = InvalidXLogRecPtr;
-TimestampTz replorigin_session_origin_timestamp = 0;
+session_local RepOriginId replorigin_session_origin = InvalidRepOriginId; /* assumed identity */
+session_local XLogRecPtr	replorigin_session_origin_lsn = InvalidXLogRecPtr;
+session_local TimestampTz replorigin_session_origin_timestamp = 0;
 
 /*
  * Base address into a shared memory array of replication states of size
@@ -176,7 +176,7 @@ static global ReplicationStateCtl *replication_states_ctl;
  * replaying remote commits, so we don't have to search ReplicationState for
  * the backends current RepOriginId.
  */
-static ReplicationState *session_replication_state = NULL;
+static session_local ReplicationState *session_replication_state = NULL;
 
 /* Magic for on disk files. */
 #define REPLICATION_STATE_MAGIC ((uint32) 0x1257DADE)

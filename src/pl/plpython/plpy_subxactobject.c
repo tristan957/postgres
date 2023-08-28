@@ -12,7 +12,7 @@
 #include "plpython.h"
 #include "utils/memutils.h"
 
-List	   *explicit_subtransactions = NIL;
+session_local List	   *explicit_subtransactions = NIL;
 
 
 static void PLy_subtransaction_dealloc(PyObject *subxact);

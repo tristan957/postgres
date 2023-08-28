@@ -25,7 +25,7 @@
 #include "storage/backendid.h"
 
 
-ProtocolVersion FrontendProtocol;
+session_local ProtocolVersion FrontendProtocol;
 
 session_local volatile sig_atomic_t InterruptPending = false;
 session_local volatile sig_atomic_t QueryCancelPending = false;
@@ -109,8 +109,8 @@ global pid_t	PostmasterPid = 0;
  *
  * These are initialized for the bootstrap/standalone case.
  */
-bool		IsPostmasterEnvironment = false;
-bool		IsUnderPostmaster = false;
+session_local bool		IsPostmasterEnvironment = false;
+session_local bool		IsUnderPostmaster = false;
 bool		IsBinaryUpgrade = false;
 session_local bool		IsBackgroundWorker = false;
 
@@ -135,9 +135,9 @@ session_guc int			max_parallel_maintenance_workers = 2;
  * MaxBackends is computed by PostmasterMain after modules have had a chance to
  * register background workers.
  */
-postmaster_guc int			NBuffers = 16384;
-postmaster_guc int			MaxConnections = 100;
-postmaster_guc int			max_worker_processes = 8;
+postmaster_guc int		NBuffers = 16384;
+postmaster_guc int		MaxConnections = 100;
+postmaster_guc int		max_worker_processes = 8;
 session_guc int			max_parallel_workers = 8;
 dynamic_singleton int	MaxBackends = 0;
 

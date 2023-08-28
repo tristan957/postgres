@@ -4003,10 +4003,10 @@ reindex_relation(Oid relid, int flags, const ReindexParams *params)
  * ----------------------------------------------------------------
  */
 
-static Oid	currentlyReindexedHeap = InvalidOid;
-static Oid	currentlyReindexedIndex = InvalidOid;
-static List *pendingReindexedIndexes = NIL;
-static int	reindexingNestLevel = 0;
+static session_local Oid	currentlyReindexedHeap = InvalidOid;
+static session_local Oid	currentlyReindexedIndex = InvalidOid;
+static session_local List *pendingReindexedIndexes = NIL;
+static session_local int	reindexingNestLevel = 0;
 
 /*
  * ReindexIsProcessingHeap

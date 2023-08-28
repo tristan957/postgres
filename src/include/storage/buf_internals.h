@@ -308,7 +308,7 @@ typedef struct WritebackContext
 /* in buf_init.c */
 extern PGDLLIMPORT global BufferDescPadded *BufferDescriptors;
 extern PGDLLIMPORT global ConditionVariableMinimallyPadded *BufferIOCVArray;
-extern PGDLLIMPORT WritebackContext BackendWritebackContext;
+extern PGDLLIMPORT session_local WritebackContext BackendWritebackContext;
 
 /* in localbuf.c */
 extern PGDLLIMPORT session_local BufferDesc *LocalBufferDescriptors;

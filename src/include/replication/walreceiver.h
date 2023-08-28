@@ -405,7 +405,7 @@ typedef struct WalReceiverFunctionsType
 	walrcv_disconnect_fn walrcv_disconnect;
 } WalReceiverFunctionsType;
 
-extern PGDLLIMPORT WalReceiverFunctionsType *WalReceiverFunctions;
+extern PGDLLIMPORT session_local WalReceiverFunctionsType *WalReceiverFunctions;
 
 #define walrcv_connect(conninfo, logical, must_use_password, appname, err) \
 	WalReceiverFunctions->walrcv_connect(conninfo, logical, must_use_password, appname, err)

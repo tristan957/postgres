@@ -52,7 +52,7 @@ extern PGDLLIMPORT session_guc bool log_checkpoints;
 extern PGDLLIMPORT session_guc bool track_wal_io_timing;
 extern PGDLLIMPORT postmaster_guc int wal_decode_buffer_size;
 
-extern PGDLLIMPORT int CheckPointSegments;
+extern PGDLLIMPORT session_local int CheckPointSegments;
 
 /* Archive modes */
 typedef enum ArchiveMode

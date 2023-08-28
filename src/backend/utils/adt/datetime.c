@@ -257,11 +257,11 @@ static userset_guc TimeZoneAbbrevTable *zoneabbrevtbl = NULL;
 
 /* Caches of recent lookup results in the above tables */
 
-static const datetkn *datecache[MAXDATEFIELDS] = {NULL};
+static session_local const datetkn *datecache[MAXDATEFIELDS] = {NULL};
 
-static const datetkn *deltacache[MAXDATEFIELDS] = {NULL};
+static session_local const datetkn *deltacache[MAXDATEFIELDS] = {NULL};
 
-static const datetkn *abbrevcache[MAXDATEFIELDS] = {NULL};
+static session_local const datetkn *abbrevcache[MAXDATEFIELDS] = {NULL};
 
 
 /*

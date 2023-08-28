@@ -197,9 +197,9 @@ static global TwoPhaseStateData *TwoPhaseState;
  * TwoPhaseStateLock, though obviously the pointer itself doesn't need to be
  * (since it's just local memory).
  */
-static GlobalTransaction MyLockedGxact = NULL;
+static session_local GlobalTransaction MyLockedGxact = NULL;
 
-static bool twophaseExitRegistered = false;
+static session_local bool twophaseExitRegistered = false;
 
 static void RecordTransactionCommitPrepared(TransactionId xid,
 											int nchildren,
@@ -993,7 +993,7 @@ typedef struct StateFileChunk
 	struct StateFileChunk *next;
 } StateFileChunk;
 
-static struct xllist
+static session_local struct xllist
 {
 	StateFileChunk *head;		/* first data block in the chain */
 	StateFileChunk *tail;		/* last block in chain */

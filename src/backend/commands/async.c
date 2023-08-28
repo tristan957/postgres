@@ -367,7 +367,7 @@ typedef struct ActionList
 	struct ActionList *upper;	/* details for upper transaction levels */
 } ActionList;
 
-static ActionList *pendingActions = NULL;
+static session_local ActionList *pendingActions = NULL;
 
 /*
  * State for outbound notifies consists of a list of all channels+payloads
