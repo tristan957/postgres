@@ -229,7 +229,7 @@ static session_local PerlInterpreter *plperl_held_interp = NULL;
 
 /* GUC variables */
 static userset_guc bool plperl_use_strict = false;
-static char *plperl_on_init = NULL;
+static sighup_guc char *plperl_on_init = NULL;
 static suset_guc char *plperl_on_plperl_init = NULL;
 static suset_guc char *plperl_on_plperlu_init = NULL;
 

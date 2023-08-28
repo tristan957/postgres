@@ -64,7 +64,7 @@ typedef int File;
 #ifndef FRONTEND
 extern PGDLLIMPORT postmaster_guc int max_files_per_process;
 extern PGDLLIMPORT postmaster_guc bool data_sync_retry;
-extern PGDLLIMPORT int recovery_init_sync_method;
+extern PGDLLIMPORT sighup_guc int recovery_init_sync_method;
 extern PGDLLIMPORT postmaster_guc int io_direct_flags;
 #endif
 

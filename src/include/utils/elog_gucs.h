@@ -16,7 +16,7 @@
 
 extern PGDLLIMPORT session_guc int Log_error_verbosity;
 extern PGDLLIMPORT sighup_guc char *Log_line_prefix;
-extern PGDLLIMPORT int Log_destination;
+extern PGDLLIMPORT sighup_guc int Log_destination;
 extern PGDLLIMPORT sighup_guc char *Log_destination_string;
 extern PGDLLIMPORT sighup_guc bool syslog_sequence_numbers;
 extern PGDLLIMPORT sighup_guc bool syslog_split_messages;

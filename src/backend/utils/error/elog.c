@@ -111,7 +111,7 @@ session_local emit_log_hook_type emit_log_hook = NULL;
 /* GUC parameters */
 session_guc int			Log_error_verbosity = PGERROR_DEFAULT;
 sighup_guc char	   *Log_line_prefix = NULL; /* format for extra log line info */
-int			Log_destination = LOG_DESTINATION_STDERR;
+sighup_guc int			Log_destination = LOG_DESTINATION_STDERR;
 sighup_guc char	   *Log_destination_string = NULL;
 sighup_guc bool		syslog_sequence_numbers = true;
 sighup_guc bool		syslog_split_messages = true;
@@ -133,8 +133,8 @@ static suset_guc char *backtrace_symbol_list;
 #endif
 
 static session_local bool openlog_done = false;
-static char *syslog_ident = NULL;
-static int	syslog_facility = LOG_LOCAL0;
+static sighup_guc char *syslog_ident = NULL;
+static sighup_guc int	syslog_facility = LOG_LOCAL0;
 
 static void write_syslog(int level, const char *line);
 #endif

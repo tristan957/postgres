@@ -22,10 +22,10 @@
 
 
 /* GUC options */
-extern PGDLLIMPORT int BgWriterDelay;
-extern PGDLLIMPORT int CheckPointTimeout;
-extern PGDLLIMPORT int CheckPointWarning;
-extern PGDLLIMPORT double CheckPointCompletionTarget;
+extern PGDLLIMPORT sighup_guc int BgWriterDelay;
+extern PGDLLIMPORT sighup_guc int CheckPointTimeout;
+extern PGDLLIMPORT sighup_guc int CheckPointWarning;
+extern PGDLLIMPORT sighup_guc double CheckPointCompletionTarget;
 
 extern void BackgroundWriterMain(void) pg_attribute_noreturn();
 extern void CheckpointerMain(void) pg_attribute_noreturn();

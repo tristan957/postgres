@@ -58,7 +58,7 @@
 /*
  * GUC parameters
  */
-int			BgWriterDelay = 200;
+sighup_guc int			BgWriterDelay = 200;
 
 /*
  * Multiplier to apply to BgWriterDelay when we decide to hibernate.

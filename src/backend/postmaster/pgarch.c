@@ -90,7 +90,7 @@ typedef struct PgArchData
 	slock_t		arch_lck;
 } PgArchData;
 
-char	   *XLogArchiveLibrary = "";
+sighup_guc char	   *XLogArchiveLibrary = "";
 
 
 /* ----------

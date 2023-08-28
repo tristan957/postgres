@@ -69,7 +69,7 @@
 /* #define XLOGPREFETCHER_DEBUG_LEVEL LOG */
 
 /* GUCs */
-int			recovery_prefetch = RECOVERY_PREFETCH_TRY;
+sighup_guc int			recovery_prefetch = RECOVERY_PREFETCH_TRY;
 
 #ifdef USE_PREFETCH
 #define RecoveryPrefetchEnabled() \

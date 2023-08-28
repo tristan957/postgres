@@ -45,7 +45,7 @@ typedef struct BasicArchiveData
 	MemoryContext context;
 } BasicArchiveData;
 
-static char *archive_directory = NULL;
+static sighup_guc char *archive_directory = NULL;
 
 static void basic_archive_startup(ArchiveModuleState *state);
 static bool basic_archive_configured(ArchiveModuleState *state);

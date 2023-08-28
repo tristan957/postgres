@@ -162,7 +162,7 @@ dynamic_singleton int			max_safe_fds = FD_MINFREE;	/* default if not changed */
 postmaster_guc bool		data_sync_retry = false;
 
 /* How SyncDataDirectory() should do its job. */
-int			recovery_init_sync_method = RECOVERY_INIT_SYNC_METHOD_FSYNC;
+sighup_guc int			recovery_init_sync_method = RECOVERY_INIT_SYNC_METHOD_FSYNC;
 
 /* Which kinds of files should be opened with PG_O_DIRECT. */
 postmaster_guc int			io_direct_flags;

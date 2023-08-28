@@ -87,9 +87,9 @@
  * because they're passed down from the startup process, for better
  * synchronization.)
  */
-int			wal_receiver_status_interval;
-int			wal_receiver_timeout;
-bool		hot_standby_feedback;
+sighup_guc int			wal_receiver_status_interval;
+sighup_guc int			wal_receiver_timeout;
+sighup_guc bool			hot_standby_feedback;
 
 /* libpqwalreceiver connection */
 static session_local WalReceiverConn *wrconn = NULL;

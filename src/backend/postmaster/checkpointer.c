@@ -141,9 +141,9 @@ static global CheckpointerShmemStruct *CheckpointerShmem;
 /*
  * GUC parameters
  */
-int			CheckPointTimeout = 300;
-int			CheckPointWarning = 30;
-double		CheckPointCompletionTarget = 0.9;
+sighup_guc int			CheckPointTimeout = 300;
+sighup_guc int			CheckPointWarning = 30;
+sighup_guc double		CheckPointCompletionTarget = 0.9;
 
 /*
  * Private state
