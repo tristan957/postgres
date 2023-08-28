@@ -50,22 +50,16 @@ postmaster_guc int			pgstat_track_activity_query_size = 1024;
 session_local PgBackendStatus *MyBEEntry = NULL;
 
 
-#define BackendStatusArray SHMEM_BackendStatusArray
-static PgBackendStatus *BackendStatusArray = NULL;
-#define BackendAppnameBuffer SHMEM_BackendAppnameBuffer
-static char *BackendAppnameBuffer = NULL;
-#define BackendClientHostnameBuffer SHMEM_BackendClientHostnameBuffer
-static char *BackendClientHostnameBuffer = NULL;
-#define BackendActivityBuffer SHMEM_BackendActivityBuffer
-static char *BackendActivityBuffer = NULL;
-static Size BackendActivityBufferSize = 0;
+static global PgBackendStatus *BackendStatusArray = NULL;
+static global char *BackendAppnameBuffer = NULL;
+static global char *BackendClientHostnameBuffer = NULL;
+static global char *BackendActivityBuffer = NULL;
+static global Size BackendActivityBufferSize = 0;
 #ifdef USE_SSL
-#define BackendSslStatusBuffer SHMEM_BackendSslStatusBuffer
-static PgBackendSSLStatus *BackendSslStatusBuffer = NULL;
+static global PgBackendSSLStatus *BackendSslStatusBuffer = NULL;
 #endif
 #ifdef ENABLE_GSS
-#define BackendGssStatusBuffer SHMEM_BackendGssStatusBuffer
-static PgBackendGSSStatus *BackendGssStatusBuffer = NULL;
+static global PgBackendGSSStatus *BackendGssStatusBuffer = NULL;
 #endif
 
 

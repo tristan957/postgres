@@ -47,8 +47,7 @@ typedef enum
  */
 
 /* parameter variables and flags (see also optimizer.h) */
-#define disable_cost BLESSED_disable_cost
-extern PGDLLIMPORT Cost disable_cost;
+extern PGDLLIMPORT global Cost disable_cost;
 extern PGDLLIMPORT session_guc int max_parallel_workers_per_gather;
 extern PGDLLIMPORT session_guc bool enable_seqscan;
 extern PGDLLIMPORT session_guc bool enable_indexscan;

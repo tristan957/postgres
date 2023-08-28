@@ -97,11 +97,10 @@ char	   *XLogArchiveLibrary = "";
  * Local data
  * ----------
  */
-static time_t last_sigterm_time = 0;
-#define PgArch SHMEM_PgArch
-static PgArchData *PgArch = NULL;
-static const ArchiveModuleCallbacks *ArchiveCallbacks;
-static ArchiveModuleState *archive_module_state;
+static global time_t last_sigterm_time = 0;
+static global PgArchData *PgArch = NULL;
+static global const ArchiveModuleCallbacks *ArchiveCallbacks;
+static global ArchiveModuleState *archive_module_state;
 
 
 /*
@@ -127,12 +126,12 @@ struct arch_files_state
 	char		arch_filenames[NUM_FILES_PER_DIRECTORY_SCAN][MAX_XFN_CHARS + 1];
 };
 
-static struct arch_files_state *arch_files = NULL;
+static global struct arch_files_state *arch_files = NULL;
 
 /*
  * Flags set by interrupt handlers for later service in the main loop.
  */
-static volatile sig_atomic_t ready_to_stop = false;
+static global volatile sig_atomic_t ready_to_stop = false;
 
 /* ----------
  * Local function forward declarations

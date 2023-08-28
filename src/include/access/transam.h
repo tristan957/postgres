@@ -266,8 +266,7 @@ typedef VariableCacheData *VariableCache;
 extern bool TransactionStartedDuringRecovery(void);
 
 /* in transam/varsup.c */
-#define ShmemVariableCache SHMEM_ShmemVariableCache
-extern PGDLLIMPORT VariableCache ShmemVariableCache;
+extern PGDLLIMPORT global VariableCache ShmemVariableCache;
 
 /*
  * prototypes for functions in transam/transam.c

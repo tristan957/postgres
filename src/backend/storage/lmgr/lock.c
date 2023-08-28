@@ -257,7 +257,7 @@ typedef struct
 	uint32		count[FAST_PATH_STRONG_LOCK_HASH_PARTITIONS];
 } FastPathStrongRelationLockData;
 
-static volatile session_local FastPathStrongRelationLockData *FastPathStrongRelationLocks;
+static volatile global FastPathStrongRelationLockData *FastPathStrongRelationLocks;
 
 
 /*
@@ -266,10 +266,8 @@ static volatile session_local FastPathStrongRelationLockData *FastPathStrongRela
  * The LockMethodLockHash and LockMethodProcLockHash hash tables are in
  * shared memory; LockMethodLocalHash is local to each backend.
  */
-#define LockMethodLockHash SHMEM_LockMethodLockHash
-static HTAB *LockMethodLockHash;
-#define LockMethodProcLockHash SHMEM_LockMethodProcLockHash
-static HTAB *LockMethodProcLockHash;
+static global HTAB *LockMethodLockHash;
+static global HTAB *LockMethodProcLockHash;
 static session_local HTAB *LockMethodLocalHash;
 
 

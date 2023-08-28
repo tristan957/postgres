@@ -95,7 +95,7 @@
 
 
 /* We use the ShmemLock spinlock to protect LWLockCounter */
-extern slock_t *ShmemLock;
+extern global slock_t *ShmemLock;
 
 #define LW_FLAG_HAS_WAITERS			((uint32) 1 << 30)
 #define LW_FLAG_RELEASE_OK			((uint32) 1 << 29)
@@ -209,7 +209,7 @@ static int	LWLockTrancheNamesAllocated = 0;
  * the pointer by fork from the postmaster (except in the EXEC_BACKEND case,
  * where we have special measures to pass it down).
  */
-LWLockPadded *MainLWLockArray = NULL;
+global LWLockPadded *MainLWLockArray = NULL;
 
 /*
  * We use this structure to keep track of locked LWLocks for release
@@ -248,7 +248,7 @@ static int	NamedLWLockTrancheRequestsAllocated = 0;
 int			NamedLWLockTrancheRequests = 0;
 
 /* points to data in shared memory: */
-NamedLWLockTranche *NamedLWLockTrancheArray = NULL;
+global NamedLWLockTranche *NamedLWLockTrancheArray = NULL;
 
 static void InitializeLWLocks(void);
 static inline void LWLockReportWaitStart(LWLock *lock);

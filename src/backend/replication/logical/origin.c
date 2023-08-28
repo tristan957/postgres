@@ -164,13 +164,12 @@ TimestampTz replorigin_session_origin_timestamp = 0;
  * XXX: Should we use a separate variable to size this rather than
  * max_replication_slots?
  */
-static ReplicationState *replication_states;
+static global ReplicationState *replication_states;
 
 /*
  * Actual shared memory block (replication_states[] is now part of this).
  */
-#define replication_states_ctl SHMEM_replication_states_ctl
-static ReplicationStateCtl *replication_states_ctl;
+static global ReplicationStateCtl *replication_states_ctl;
 
 /*
  * Backend-local, cached element from ReplicationState for use in a backend

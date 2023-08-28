@@ -306,10 +306,8 @@ typedef struct WritebackContext
 } WritebackContext;
 
 /* in buf_init.c */
-#define BufferDescriptors SHMEM_BufferDescriptors
-extern PGDLLIMPORT BufferDescPadded *BufferDescriptors;
-#define BufferIOCVArray SHMEM_BufferIOCVArray
-extern PGDLLIMPORT ConditionVariableMinimallyPadded *BufferIOCVArray;
+extern PGDLLIMPORT global BufferDescPadded *BufferDescriptors;
+extern PGDLLIMPORT global ConditionVariableMinimallyPadded *BufferIOCVArray;
 extern PGDLLIMPORT WritebackContext BackendWritebackContext;
 
 /* in localbuf.c */
@@ -383,8 +381,7 @@ typedef struct CkptSortItem
 	int			buf_id;
 } CkptSortItem;
 
-#define CkptBufferIds SHMEM_CkptBufferIds
-extern PGDLLIMPORT CkptSortItem *CkptBufferIds;
+extern PGDLLIMPORT global CkptSortItem *CkptBufferIds;
 
 /*
  * Internal buffer management routines

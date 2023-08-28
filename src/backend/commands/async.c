@@ -294,8 +294,7 @@ typedef struct AsyncQueueControl
 	/* backend[0] is not used; used entries are from [1] to [MaxBackends] */
 } AsyncQueueControl;
 
-#define asyncQueueControl SHMEM_asyncQueueControl
-static AsyncQueueControl *asyncQueueControl;
+static global AsyncQueueControl *asyncQueueControl;
 
 #define QUEUE_HEAD					(asyncQueueControl->head)
 #define QUEUE_TAIL					(asyncQueueControl->tail)
@@ -309,8 +308,7 @@ static AsyncQueueControl *asyncQueueControl;
 /*
  * The SLRU buffer area through which we access the notification queue
  */
-#define NotifyCtlData SHMEM_NotifyCtlData
-static SlruCtlData NotifyCtlData;
+static global SlruCtlData NotifyCtlData;
 
 #define NotifyCtl					(&NotifyCtlData)
 #define QUEUE_PAGESIZE				BLCKSZ

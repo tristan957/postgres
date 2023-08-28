@@ -62,8 +62,7 @@ typedef struct
 } BufferStrategyControl;
 
 /* Pointers to shared state */
-#define StrategyControl SHMEM_StrategyControl
-static BufferStrategyControl *StrategyControl = NULL;
+static global BufferStrategyControl *StrategyControl = NULL;
 
 /*
  * Private (non-shared) state for managing a ring of shared buffers to re-use.

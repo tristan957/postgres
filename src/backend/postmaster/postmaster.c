@@ -185,11 +185,10 @@ typedef struct bkend
 	dlist_node	elem;			/* list link in BackendList */
 } Backend;
 
-static dlist_head BackendList = DLIST_STATIC_INIT(BackendList);
+static global dlist_head BackendList = DLIST_STATIC_INIT(BackendList);
 
 #ifdef EXEC_BACKEND
-#define ShmemBackendArray SHMEM_ShmemBackendArray
-static Backend *ShmemBackendArray;
+static global Backend *ShmemBackendArray;
 #endif
 
 session_local BackgroundWorker *MyBgworkerEntry = NULL;
@@ -228,7 +227,7 @@ postmaster_guc int			ReservedConnections;
 
 /* The socket(s) we're listening to. */
 #define MAXLISTEN	64
-static pgsocket ListenSocket[MAXLISTEN];
+static global pgsocket ListenSocket[MAXLISTEN];
 
 /* still more option variables */
 sighup_guc bool		EnableSSL = false;
@@ -247,14 +246,15 @@ sighup_guc bool		send_abort_for_crash = false;
 sighup_guc bool		send_abort_for_kill = false;
 
 /* PIDs of special child processes; 0 when not running */
-static pid_t StartupPID = 0,
-			BgWriterPID = 0,
-			CheckpointerPID = 0,
-			WalWriterPID = 0,
-			WalReceiverPID = 0,
-			AutoVacPID = 0,
-			PgArchPID = 0,
-			SysLoggerPID = 0;
+static global pid_t
+	StartupPID = 0,
+	BgWriterPID = 0,
+	CheckpointerPID = 0,
+	WalWriterPID = 0,
+	WalReceiverPID = 0,
+	AutoVacPID = 0,
+	PgArchPID = 0,
+	SysLoggerPID = 0;
 
 /* Startup process's status */
 typedef enum
@@ -265,7 +265,7 @@ typedef enum
 	STARTUP_CRASHED
 } StartupStatusEnum;
 
-static StartupStatusEnum StartupStatus = STARTUP_NOT_RUNNING;
+static global StartupStatusEnum StartupStatus = STARTUP_NOT_RUNNING;
 
 /* Startup/shutdown state */
 #define			NoShutdown		0
@@ -273,9 +273,9 @@ static StartupStatusEnum StartupStatus = STARTUP_NOT_RUNNING;
 #define			FastShutdown	2
 #define			ImmediateShutdown	3
 
-static int	Shutdown = NoShutdown;
+static global int	Shutdown = NoShutdown;
 
-static bool FatalError = false; /* T if recovering from backend crash */
+static global bool FatalError = false; /* T if recovering from backend crash */
 
 /*
  * We use a simple state machine to control startup, shutdown, and
@@ -335,7 +335,7 @@ typedef enum
 	PM_NO_CHILDREN				/* all important children have exited */
 } PMState;
 
-static PMState pmState = PM_INIT;
+static global PMState pmState = PM_INIT;
 
 /*
  * While performing a "smart shutdown", we restrict new connections but stay
@@ -343,53 +343,53 @@ static PMState pmState = PM_INIT;
  * connsAllowed is a sub-state indicator showing the active restriction.
  * It is of no interest unless pmState is PM_RUN or PM_HOT_STANDBY.
  */
-static bool connsAllowed = true;
+static global bool connsAllowed = true;
 
 /* Start time of SIGKILL timeout during immediate shutdown or child crash */
 /* Zero means timeout is not running */
-static time_t AbortStartTime = 0;
+static global time_t AbortStartTime = 0;
 
 /* Length of said timeout */
 #define SIGKILL_CHILDREN_AFTER_SECS		5
 
-static bool ReachedNormalRunning = false;	/* T if we've reached PM_RUN */
+static global bool ReachedNormalRunning = false;	/* T if we've reached PM_RUN */
 
 session_local bool		ClientAuthInProgress = false;	/* T during new-client
 											 * authentication */
 
-bool		redirection_done = false;	/* stderr redirected for syslogger? */
+global bool		redirection_done = false;	/* stderr redirected for syslogger? */
 
 /* received START_AUTOVAC_LAUNCHER signal */
-static bool start_autovac_launcher = false;
+static global bool start_autovac_launcher = false;
 
 /* the launcher needs to be signaled to communicate some condition */
-static bool avlauncher_needs_signal = false;
+static global bool avlauncher_needs_signal = false;
 
 /* received START_WALRECEIVER signal */
-static bool WalReceiverRequested = false;
+static global bool WalReceiverRequested = false;
 
 /* set when there's a worker that needs to be started up */
 static bool StartWorkerNeeded = true;
 static bool HaveCrashedWorker = false;
 
 /* set when signals arrive */
-static volatile sig_atomic_t pending_pm_pmsignal;
-static volatile sig_atomic_t pending_pm_child_exit;
-static volatile sig_atomic_t pending_pm_reload_request;
-static volatile sig_atomic_t pending_pm_shutdown_request;
-static volatile sig_atomic_t pending_pm_fast_shutdown_request;
-static volatile sig_atomic_t pending_pm_immediate_shutdown_request;
+static global volatile sig_atomic_t pending_pm_pmsignal;
+static global volatile sig_atomic_t pending_pm_child_exit;
+static global volatile sig_atomic_t pending_pm_reload_request;
+static global volatile sig_atomic_t pending_pm_shutdown_request;
+static global volatile sig_atomic_t pending_pm_fast_shutdown_request;
+static global volatile sig_atomic_t pending_pm_immediate_shutdown_request;
 
 /* event multiplexing object */
-static WaitEventSet *pm_wait_set;
+static global WaitEventSet *pm_wait_set;
 
 #ifdef USE_SSL
 /* Set when and if SSL has been initialized properly */
-static bool LoadedSSL = false;
+static global bool LoadedSSL = false;
 #endif
 
 #ifdef USE_BONJOUR
-static DNSServiceRef bonjour_sdref = NULL;
+static global DNSServiceRef bonjour_sdref = NULL;
 #endif
 
 /*
@@ -465,7 +465,7 @@ static void InitPostmasterDeathWatchHandle(void);
 static pid_t waitpid(pid_t pid, int *exitstatus, int options);
 static void WINAPI pgwin32_deadchild_callback(PVOID lpParameter, BOOLEAN TimerOrWaitFired);
 
-static HANDLE win32ChildQueue;
+static global HANDLE win32ChildQueue;
 
 typedef struct
 {
@@ -573,10 +573,10 @@ static void ShmemBackendArrayRemove(Backend *bn);
  * File descriptors for pipe used to monitor if postmaster is alive.
  * First is POSTMASTER_FD_WATCH, second is POSTMASTER_FD_OWN.
  */
-int			postmaster_alive_fds[2] = {-1, -1};
+global int			postmaster_alive_fds[2] = {-1, -1};
 #else
 /* Process handle of postmaster used for the same purpose on Windows */
-HANDLE		PostmasterHandle;
+global HANDLE		PostmasterHandle;
 #endif
 
 /*

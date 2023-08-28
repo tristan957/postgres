@@ -300,8 +300,7 @@ typedef struct
 	pg_atomic_uint32 av_nworkersForBalance;
 } AutoVacuumShmemStruct;
 
-#define AutoVacuumShmem SHMEM_AutoVacuumShmem
-static AutoVacuumShmemStruct *AutoVacuumShmem;
+static global AutoVacuumShmemStruct *AutoVacuumShmem;
 
 /*
  * the database list (of avl_dbase elements) in the launcher, and the context

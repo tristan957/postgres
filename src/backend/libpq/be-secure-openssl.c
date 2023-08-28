@@ -54,7 +54,7 @@
 
 /* default init hook can be overridden by a shared library */
 static void default_openssl_tls_init(SSL_CTX *context, bool isServerStart);
-openssl_tls_init_hook_typ openssl_tls_init_hook = default_openssl_tls_init;
+global openssl_tls_init_hook_typ openssl_tls_init_hook = default_openssl_tls_init;
 
 static int	my_sock_read(BIO *h, char *buf, int size);
 static int	my_sock_write(BIO *h, const char *buf, int size);

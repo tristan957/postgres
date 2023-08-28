@@ -162,8 +162,7 @@ typedef struct
 	sig_atomic_t force_reply;	/* used as a bool */
 } WalRcvData;
 
-#define WalRcv SHMEM_WalRcv
-extern PGDLLIMPORT WalRcvData *WalRcv;
+extern PGDLLIMPORT global WalRcvData *WalRcv;
 
 typedef struct
 {

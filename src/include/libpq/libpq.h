@@ -87,8 +87,7 @@ extern bool pq_check_connection(void);
 /*
  * prototypes for functions in be-secure.c
  */
-#define ssl_library BLESSED_ssl_library
-extern PGDLLIMPORT char *ssl_library;
+extern PGDLLIMPORT global char *ssl_library;
 extern PGDLLIMPORT sighup_guc char *ssl_cert_file;
 extern PGDLLIMPORT sighup_guc char *ssl_key_file;
 extern PGDLLIMPORT sighup_guc char *ssl_ca_file;

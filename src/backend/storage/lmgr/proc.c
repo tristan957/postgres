@@ -72,15 +72,12 @@ session_local PGPROC	   *MyProc = NULL;
  * relatively infrequently (only at backend startup or shutdown) and not for
  * very long, so a spinlock is okay.
  */
-NON_EXEC_STATIC slock_t *ProcStructLock = NULL;
+NON_EXEC_STATIC global slock_t *ProcStructLock = NULL;
 
 /* Pointers to shared-memory structures */
-#define ProcGlobal SHMEM_ProcGlobal
-PROC_HDR   *ProcGlobal = NULL;
-#define AuxiliaryProcs SHMEM_AuxiliaryProcs
-NON_EXEC_STATIC PGPROC *AuxiliaryProcs = NULL;
-#define PreparedXactProcs SHMEM_PreparedXactProcs
-PGPROC	   *PreparedXactProcs = NULL;
+global PROC_HDR   *ProcGlobal = NULL;
+NON_EXEC_STATIC global PGPROC *AuxiliaryProcs = NULL;
+global PGPROC	   *PreparedXactProcs = NULL;
 
 /* If we are waiting for a lock, this points to the associated LOCALLOCK */
 static LOCALLOCK *lockAwaited = NULL;

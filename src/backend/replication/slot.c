@@ -93,8 +93,7 @@ typedef struct ReplicationSlotOnDisk
 #define SLOT_VERSION	3		/* version for new files */
 
 /* Control array for replication slot management */
-#define ReplicationSlotCtl SHMEM_ReplicationSlotCtl
-ReplicationSlotCtlData *ReplicationSlotCtl = NULL;
+global ReplicationSlotCtlData *ReplicationSlotCtl = NULL;
 
 /* My backend's replication slot in the shared memory array */
 session_local ReplicationSlot *MyReplicationSlot = NULL;

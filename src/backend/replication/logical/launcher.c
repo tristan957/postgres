@@ -73,8 +73,7 @@ typedef struct LogicalRepCtxStruct
 	LogicalRepWorker workers[FLEXIBLE_ARRAY_MEMBER];
 } LogicalRepCtxStruct;
 
-#define LogicalRepCtx SHMEM_LogicalRepCtx
-static LogicalRepCtxStruct *LogicalRepCtx;
+static global LogicalRepCtxStruct *LogicalRepCtx;
 
 /* an entry in the last-start-times shared hash table */
 typedef struct LauncherLastStartTimesEntry

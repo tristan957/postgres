@@ -31,8 +31,7 @@
 #include "storage/shmem.h"
 #include "utils/timestamp.h"
 
-#define WalRcv SHMEM_WalRcv
-WalRcvData *WalRcv = NULL;
+global WalRcvData *WalRcv = NULL;
 
 /*
  * How long to wait for walreceiver to start up after requesting

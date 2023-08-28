@@ -31,8 +31,7 @@ typedef struct
 	int			id;				/* Associated buffer ID */
 } BufferLookupEnt;
 
-#define SharedBufHash SHMEM_SharedBufHash
-static HTAB *SharedBufHash;
+static global HTAB *SharedBufHash;
 
 
 /*

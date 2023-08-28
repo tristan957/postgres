@@ -70,7 +70,7 @@ typedef union LWLockPadded
 	char		pad[LWLOCK_PADDED_SIZE];
 } LWLockPadded;
 
-extern PGDLLIMPORT LWLockPadded *MainLWLockArray;
+extern PGDLLIMPORT global LWLockPadded *MainLWLockArray;
 
 /* struct for storing named tranche information */
 typedef struct NamedLWLockTranche
@@ -79,7 +79,7 @@ typedef struct NamedLWLockTranche
 	char	   *trancheName;
 } NamedLWLockTranche;
 
-extern PGDLLIMPORT NamedLWLockTranche *NamedLWLockTrancheArray;
+extern PGDLLIMPORT global NamedLWLockTranche *NamedLWLockTrancheArray;
 extern PGDLLIMPORT int NamedLWLockTrancheRequests;
 
 /* Names for fixed lwlocks */

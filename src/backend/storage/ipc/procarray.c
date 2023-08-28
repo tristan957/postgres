@@ -269,11 +269,9 @@ typedef enum KAXCompressReason
 } KAXCompressReason;
 
 
-#define procArray SHMEM_procArray
-static ProcArrayStruct *procArray;
+static global ProcArrayStruct *procArray;
 
-#define allProcs SHMEM_allProcs
-static PGPROC *allProcs;
+static global PGPROC *allProcs;
 
 /*
  * Cache to reduce overhead of repeated calls to TransactionIdIsInProgress()
@@ -283,11 +281,9 @@ static session_local TransactionId cachedXidIsNotInProgress = InvalidTransaction
 /*
  * Bookkeeping for tracking emulated transactions in recovery
  */
-#define KnownAssignedXids SHMEM_KnownAssignedXids
-static TransactionId *KnownAssignedXids;
-#define KnownAssignedXidsValid SHMEM_KnownAssignedXidsValid
-static bool *KnownAssignedXidsValid;
-static TransactionId latestObservedXid = InvalidTransactionId;
+static global TransactionId *KnownAssignedXids;
+static global bool *KnownAssignedXidsValid;
+static global TransactionId latestObservedXid = InvalidTransactionId;
 
 /*
  * If we're in STANDBY_SNAPSHOT_PENDING state, standbySnapshotPendingXmin is
@@ -453,9 +449,7 @@ CreateSharedProcArray(void)
 	}
 
 	allProcs =
-#undef allProcs
 		ProcGlobal->allProcs;
-#define allProcs SHMEM_allProcs
 
 	/* Create or attach to the KnownAssignedXids arrays too, if needed */
 	if (EnableHotStandby)
@@ -591,9 +585,7 @@ ProcArrayRemove(PGPROC *proc, TransactionId latestXid)
 	myoff = proc->pgxactoff;
 
 	Assert(myoff >= 0 && myoff < arrayP->numProcs);
-#undef allProcs
 	Assert(ProcGlobal->allProcs[arrayP->pgprocnos[myoff]].pgxactoff == myoff);
-#define allProcs SHMEM_allProcs
 
 	if (TransactionIdIsValid(latestXid))
 	{

@@ -63,7 +63,7 @@ ProcessingMode Mode = InitProcessing;
 session_local BackendType MyBackendType;
 
 /* List of lock files to be removed at proc exit */
-static List *lock_files = NIL;
+static global List *lock_files = NIL;
 
 static Latch LocalLatchData;
 

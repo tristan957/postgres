@@ -71,10 +71,10 @@ extern PGDLLIMPORT session_local TimeLineID recoveryTargetTLIRequested;
 extern PGDLLIMPORT session_local TimeLineID recoveryTargetTLI;
 
 /* Have we already reached a consistent database state? */
-extern PGDLLIMPORT bool reachedConsistency;
+extern PGDLLIMPORT global bool reachedConsistency;
 
 /* Are we currently in standby mode? */
-extern PGDLLIMPORT bool StandbyMode;
+extern PGDLLIMPORT global bool StandbyMode;
 
 extern Size XLogRecoveryShmemSize(void);
 extern void XLogRecoveryShmemInit(void);

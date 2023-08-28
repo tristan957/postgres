@@ -317,8 +317,7 @@
 /*
  * The SLRU buffer area through which we access the old xids.
  */
-#define SerialSlruCtlData SHMEM_SerialSlruCtlData
-static SlruCtlData SerialSlruCtlData;
+static global SlruCtlData SerialSlruCtlData;
 
 #define SerialSlruCtl			(&SerialSlruCtlData)
 
@@ -348,8 +347,7 @@ typedef struct SerialControlData
 
 typedef struct SerialControlData *SerialControl;
 
-#define serialControl SHMEM_serialControl
-static SerialControl serialControl;
+static global SerialControl serialControl;
 
 /*
  * When the oldest committed transaction on the "finished" list is moved to
@@ -379,28 +377,22 @@ sighup_guc int			max_predicate_locks_per_page;	/* in guc_tables.c */
  * number of entries in the list, and the size allowed for each entry is
  * fixed upon creation.
  */
-#define PredXact SHMEM_PredXact
-static PredXactList PredXact;
+static global PredXactList PredXact;
 
 /*
  * This provides a pool of RWConflict data elements to use in conflict lists
  * between transactions.
  */
-#define RWConflictPool SHMEM_RWConflictPool
-static RWConflictPoolHeader RWConflictPool;
+static global RWConflictPoolHeader RWConflictPool;
 
 /*
  * The predicate locking hash tables are in shared memory.
  * Each backend keeps pointers to them.
  */
-#define SerializableXidHash SHMEM_SerializableXidHash
-static HTAB *SerializableXidHash;
-#define PredicateLockTargetHash SHMEM_PredicateLockTargetHash
-static HTAB *PredicateLockTargetHash;
-#define PredicateLockHash SHMEM_PredicateLockHash
-static HTAB *PredicateLockHash;
-#define FinishedSerializableTransactions SHMEM_FinishedSerializableTransactions
-static dlist_head *FinishedSerializableTransactions;
+static global HTAB *SerializableXidHash;
+static global HTAB *PredicateLockTargetHash;
+static global HTAB *PredicateLockHash;
+static global dlist_head *FinishedSerializableTransactions;
 
 /*
  * Tag for a dummy entry in PredicateLockTargetHash. By temporarily removing
@@ -408,10 +400,8 @@ static dlist_head *FinishedSerializableTransactions;
  * inserting one entry in the hash table. This is an otherwise-invalid tag.
  */
 static static_singleton const PREDICATELOCKTARGETTAG ScratchTargetTag = {0, 0, 0, 0};
-#define ScratchTargetTagHash BLESSED_ScratchTargetTagHash
-static session_local uint32 ScratchTargetTagHash;
-#define ScratchPartitionLock BLESSED_ScratchPartitionLock
-static LWLock *ScratchPartitionLock;
+static global uint32 ScratchTargetTagHash;
+static global LWLock *ScratchPartitionLock;
 
 /*
  * The local hash table used to determine when to combine multiple fine-

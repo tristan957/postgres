@@ -559,17 +559,15 @@ typedef struct XLogCtlData
 	slock_t		info_lck;		/* locks shared variables shown above */
 } XLogCtlData;
 
-static XLogCtlData *XLogCtl = NULL;
+static global XLogCtlData *XLogCtl = NULL;
 
 /* a private copy of XLogCtl->Insert.WALInsertLocks, for convenience */
-#define WALInsertLocks BLESSED_WALInsertLocks
-static WALInsertLockPadded *WALInsertLocks = NULL;
+static global WALInsertLockPadded *WALInsertLocks = NULL;
 
 /*
  * We maintain an image of pg_control in shared memory.
  */
-#define ControlFile SHMEM_ControlFile
-static ControlFileData *ControlFile = NULL;
+static global ControlFileData *ControlFile = NULL;
 
 /*
  * Calculate the amount of space left on the page after 'endptr'. Beware
@@ -601,8 +599,7 @@ static ControlFileData *ControlFile = NULL;
 #define ConvertToXSegs(x, segsize)	XLogMBVarToSegs((x), (segsize))
 
 /* The number of bytes in a WAL segment usable for WAL data. */
-#define UsableBytesInSegment BLESSED_UsableBytesInSegment
-static int	UsableBytesInSegment;
+static global int	UsableBytesInSegment;
 
 /*
  * Private, possibly out-of-date copy of shared LogwrtResult.
@@ -3998,8 +3995,7 @@ ReadControlFile(void)
 {
 	pg_crc32c	crc;
 	int			fd;
-#define wal_segsz_str BLESSED_wal_segsz_str
-	static char wal_segsz_str[20];
+	static global char wal_segsz_str[20];
 	int			r;
 
 	/*
@@ -4601,9 +4597,7 @@ XLOGShmemInit(void)
 
 		/* Initialize local copy of WALInsertLocks */
 		WALInsertLocks =
-#undef WALInsertLocks
 			XLogCtl->Insert.WALInsertLocks;
-#define WALInsertLocks BLESSED_WALInsertLocks
 
 		if (localControlFile)
 			pfree(localControlFile);
@@ -4636,9 +4630,7 @@ XLOGShmemInit(void)
 	allocptr += sizeof(WALInsertLockPadded) -
 		((uintptr_t) allocptr) % sizeof(WALInsertLockPadded);
 	WALInsertLocks =
-#undef WALInsertLocks
 		XLogCtl->Insert.WALInsertLocks =
-#define WALInsertLocks BLESSED_WALInsertLocks
 		(WALInsertLockPadded *) allocptr;
 	allocptr += sizeof(WALInsertLockPadded) * NUM_XLOGINSERT_LOCKS;
 

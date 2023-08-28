@@ -31,8 +31,7 @@ extern PGDLLIMPORT session_local XLogRecPtr XactLastRecEnd;
 extern PGDLLIMPORT session_local XLogRecPtr XactLastCommitEnd;
 
 /* these variables are GUC parameters related to XLOG */
-#define wal_segment_size BLESSED_wal_segment_size
-extern PGDLLIMPORT int wal_segment_size;
+extern PGDLLIMPORT global int wal_segment_size;
 extern PGDLLIMPORT sighup_guc int min_wal_size_mb;
 extern PGDLLIMPORT sighup_guc int max_wal_size_mb;
 extern PGDLLIMPORT sighup_guc int wal_keep_size_mb;

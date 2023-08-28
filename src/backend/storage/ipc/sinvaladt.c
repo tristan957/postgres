@@ -188,8 +188,7 @@ typedef struct SISeg
 	ProcState	procState[FLEXIBLE_ARRAY_MEMBER];
 } SISeg;
 
-#define shmInvalBuffer SHMEM_shmInvalBuffer
-static SISeg *shmInvalBuffer;	/* pointer to the shared inval buffer */
+static global SISeg *shmInvalBuffer;	/* pointer to the shared inval buffer */
 
 
 static session_local LocalTransactionId nextLocalTransactionId;

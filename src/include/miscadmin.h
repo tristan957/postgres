@@ -162,13 +162,13 @@ do { \
  * from utils/init/globals.c
  */
 #ifndef FRONTEND
-extern PGDLLIMPORT pid_t PostmasterPid;
+extern PGDLLIMPORT global pid_t PostmasterPid;
 extern PGDLLIMPORT bool IsPostmasterEnvironment;
 extern PGDLLIMPORT bool IsUnderPostmaster;
 extern PGDLLIMPORT session_local bool IsBackgroundWorker;
 extern PGDLLIMPORT bool IsBinaryUpgrade;
 
-extern PGDLLIMPORT bool IsMultiThreaded;
+extern PGDLLIMPORT global bool IsMultiThreaded;
 
 extern PGDLLIMPORT bool ExitOnAnyError;
 
