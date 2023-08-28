@@ -143,7 +143,7 @@ session_guc bool		track_wal_io_timing = false;
 session_guc bool		XLOG_DEBUG = false;
 #endif
 
-int			wal_segment_size = DEFAULT_XLOG_SEG_SIZE;
+internal_guc int			wal_segment_size = DEFAULT_XLOG_SEG_SIZE;
 
 /*
  * Number of WAL insertion locks to use. A higher value allows more insertions

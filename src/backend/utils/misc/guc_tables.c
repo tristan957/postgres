@@ -571,8 +571,8 @@ static session_guc double phony_random_seed;
 static session_guc char *client_encoding_string;
 static session_guc char *datestyle_string;
 static session_local char *server_encoding_string;
-static char *server_version_string;
-static int	server_version_num;
+static internal_guc char *server_version_string;
+static internal_guc int	server_version_num;
 static postmaster_guc char *debug_io_direct_string;
 
 #ifdef HAVE_SYSLOG
@@ -587,25 +587,23 @@ static sighup_guc char *log_timezone_string;
 static session_guc char *timezone_abbreviations_string;
 static char *data_directory;
 static session_guc char *session_authorization_string;
-static int	max_function_args;
-static int	max_index_keys;
-static int	max_identifier_length;
-static int	block_size;
-static int	segment_size;
-static int	shared_memory_size_mb;
-static int	shared_memory_size_in_huge_pages;
-static int	wal_block_size;
-static bool data_checksums;
-#define integer_datetimes BLESSED_integer_datetimes
-static bool integer_datetimes;
+static internal_guc int	max_function_args;
+static internal_guc int	max_index_keys;
+static internal_guc int	max_identifier_length;
+static internal_guc int	block_size;
+static internal_guc int	segment_size;
+static internal_guc int	shared_memory_size_mb;
+static internal_guc int	shared_memory_size_in_huge_pages;
+static internal_guc int	wal_block_size;
+static internal_guc bool data_checksums;
+static internal_guc bool integer_datetimes;
 
 #ifdef USE_ASSERT_CHECKING
 #define DEFAULT_ASSERT_ENABLED true
 #else
 #define DEFAULT_ASSERT_ENABLED false
 #endif
-#define assert_enabled BLESSED_assert_enabled
-static bool assert_enabled = DEFAULT_ASSERT_ENABLED;
+static internal_guc bool assert_enabled = DEFAULT_ASSERT_ENABLED;
 
 static postmaster_guc char *recovery_target_timeline_string;
 static postmaster_guc char *recovery_target_string;
@@ -617,7 +615,7 @@ static postmaster_guc char *recovery_target_lsn_string;
 session_guc char	   *role_string;
 
 /* should be static, but guc.c needs to get at this */
-bool		in_hot_standby_guc;
+internal_guc bool		in_hot_standby_guc;
 
 
 /*
