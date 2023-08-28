@@ -282,7 +282,7 @@ static const struct config_enum_entry track_options[] =
 	{NULL, 0, false}
 };
 
-static int	pgss_max = 5000;	/* max # statements to track */
+static postmaster_guc int	pgss_max = 5000;	/* max # statements to track */
 static suset_guc int	pgss_track = PGSS_TRACK_TOP;	/* tracking level */
 static suset_guc bool pgss_track_utility = true;	/* whether to track utility commands */
 static suset_guc bool pgss_track_planning = false;	/* whether to track planning

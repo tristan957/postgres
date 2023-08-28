@@ -102,7 +102,7 @@ static shmem_request_hook_type prev_shmem_request_hook = NULL;
 static AutoPrewarmSharedState *apw_state = NULL;
 
 /* GUC variables. */
-static bool autoprewarm = true; /* start worker? */
+static postmaster_guc bool autoprewarm = true; /* start worker? */
 static int	autoprewarm_interval = 300; /* dump interval */
 
 /*

@@ -585,7 +585,7 @@ static sighup_guc int	syslog_facility = DEFAULT_SYSLOG_FACILITY;
 static session_guc char *timezone_string;
 static sighup_guc char *log_timezone_string;
 static session_guc char *timezone_abbreviations_string;
-static char *data_directory;
+static postmaster_guc char *data_directory;
 static session_guc char *session_authorization_string;
 static internal_guc int	max_function_args;
 static internal_guc int	max_index_keys;

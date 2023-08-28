@@ -140,7 +140,7 @@ static void write_syslog(int level, const char *line);
 #endif
 
 #ifdef WIN32
-extern char *event_source;
+extern postmaster_guc char *event_source;
 
 static void write_eventlog(int level, const char *line, int len);
 #endif
