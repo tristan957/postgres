@@ -123,16 +123,16 @@ session_local bool		InitializingParallelWorker = false;
 static session_local FixedParallelState *MyFixedParallelState;
 
 /* List of active parallel contexts. */
-static dlist_head pcxt_list = DLIST_STATIC_INIT(pcxt_list);
+static /* FIXME: session_local */ dlist_head pcxt_list = DLIST_STATIC_INIT(pcxt_list);
 
 /* Backend-local copy of data from FixedParallelState. */
-static pid_t ParallelLeaderPid;
+static session_local pid_t ParallelLeaderPid;
 
 /*
  * List of internal parallel worker entry points.  We need this for
  * reasons explained in LookupParallelWorkerFunction(), below.
  */
-static const struct
+static static_singleton const struct
 {
 	const char *fn_name;
 	parallel_worker_main_type fn_addr;

@@ -1836,7 +1836,7 @@ pg_utf8_verifychar(const unsigned char *s, int len)
 /* invalid byte */
 #define ILL ERR
 
-static const uint32 Utf8Transition[256] =
+static static_singleton const uint32 Utf8Transition[256] =
 {
 	/* ASCII */
 
@@ -2073,7 +2073,7 @@ pg_utf8_islegal(const unsigned char *source, int length)
  * XXX must be sorted by the same order as enum pg_enc (in mb/pg_wchar.h)
  *-------------------------------------------------------------------
  */
-const pg_wchar_tbl pg_wchar_table[] = {
+static_singleton const pg_wchar_tbl pg_wchar_table[] = {
 	{pg_ascii2wchar_with_len, pg_wchar2single_with_len, pg_ascii_mblen, pg_ascii_dsplen, pg_ascii_verifychar, pg_ascii_verifystr, 1},	/* PG_SQL_ASCII */
 	{pg_eucjp2wchar_with_len, pg_wchar2euc_with_len, pg_eucjp_mblen, pg_eucjp_dsplen, pg_eucjp_verifychar, pg_eucjp_verifystr, 3},	/* PG_EUC_JP */
 	{pg_euccn2wchar_with_len, pg_wchar2euc_with_len, pg_euccn_mblen, pg_euccn_dsplen, pg_euccn_verifychar, pg_euccn_verifystr, 2},	/* PG_EUC_CN */

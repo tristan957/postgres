@@ -407,7 +407,7 @@ static dlist_head *FinishedSerializableTransactions;
  * this entry, you can ensure that there's enough scratch space available for
  * inserting one entry in the hash table. This is an otherwise-invalid tag.
  */
-static session_local const PREDICATELOCKTARGETTAG ScratchTargetTag = {0, 0, 0, 0};
+static static_singleton const PREDICATELOCKTARGETTAG ScratchTargetTag = {0, 0, 0, 0};
 #define ScratchTargetTagHash BLESSED_ScratchTargetTagHash
 static session_local uint32 ScratchTargetTagHash;
 #define ScratchPartitionLock BLESSED_ScratchPartitionLock

@@ -34,7 +34,7 @@ static void plpgsql_extra_errors_assign_hook(const char *newvalue, void *extra);
 PG_MODULE_MAGIC;
 
 /* Custom GUC variable */
-static const struct config_enum_entry variable_conflict_options[] = {
+static static_singleton const struct config_enum_entry variable_conflict_options[] = {
 	{"error", PLPGSQL_RESOLVE_ERROR, false},
 	{"use_variable", PLPGSQL_RESOLVE_VARIABLE, false},
 	{"use_column", PLPGSQL_RESOLVE_COLUMN, false},

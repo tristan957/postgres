@@ -253,7 +253,7 @@ shared_record_table_hash(const void *a, size_t size, void *arg)
 }
 
 /* Parameters for SharedRecordTypmodRegistry's TupleDesc table. */
-static const dshash_parameters srtr_record_table_params = {
+static static_singleton const dshash_parameters srtr_record_table_params = {
 	sizeof(SharedRecordTableKey),	/* unused */
 	sizeof(SharedRecordTableEntry),
 	shared_record_table_compare,
@@ -262,7 +262,7 @@ static const dshash_parameters srtr_record_table_params = {
 };
 
 /* Parameters for SharedRecordTypmodRegistry's typmod hash table. */
-static const dshash_parameters srtr_typmod_table_params = {
+static static_singleton const dshash_parameters srtr_typmod_table_params = {
 	sizeof(uint32),
 	sizeof(SharedTypmodTableEntry),
 	dshash_memcmp,

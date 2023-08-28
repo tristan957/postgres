@@ -89,7 +89,7 @@ struct typinfo
 	Oid			outproc;
 };
 
-static const struct typinfo TypInfo[] = {
+static static_singleton const struct typinfo TypInfo[] = {
 	{"bool", BOOLOID, 0, 1, true, TYPALIGN_CHAR, TYPSTORAGE_PLAIN, InvalidOid,
 	F_BOOLIN, F_BOOLOUT},
 	{"bytea", BYTEAOID, 0, -1, false, TYPALIGN_INT, TYPSTORAGE_EXTENDED, InvalidOid,
@@ -142,7 +142,7 @@ static const struct typinfo TypInfo[] = {
 	F_ARRAY_IN, F_ARRAY_OUT}
 };
 
-static const int n_types = sizeof(TypInfo) / sizeof(struct typinfo);
+static static_singleton const int n_types = sizeof(TypInfo) / sizeof(struct typinfo);
 
 struct typmap
 {								/* a hack */

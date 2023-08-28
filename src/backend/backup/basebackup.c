@@ -127,7 +127,7 @@ struct exclude_list_item
  * Note: this list should be kept in sync with the filter lists in pg_rewind's
  * filemap.c.
  */
-static const char *const excludeDirContents[] =
+static static_singleton const char *const excludeDirContents[] =
 {
 	/*
 	 * Skip temporary statistics files. PG_STAT_TMP_DIR must be skipped
@@ -167,7 +167,7 @@ static const char *const excludeDirContents[] =
 /*
  * List of files excluded from backups.
  */
-static const struct exclude_list_item excludeFiles[] =
+static static_singleton const struct exclude_list_item excludeFiles[] =
 {
 	/* Skip auto conf temporary file. */
 	{PG_AUTOCONF_FILENAME ".tmp", false},
@@ -209,7 +209,7 @@ static const struct exclude_list_item excludeFiles[] =
  * Note: this list should be kept in sync with what pg_checksums.c
  * includes.
  */
-static const struct exclude_list_item noChecksumFiles[] = {
+static static_singleton const struct exclude_list_item noChecksumFiles[] = {
 	{"pg_control", false},
 	{"pg_filenode.map", false},
 	{"pg_internal.init", true},

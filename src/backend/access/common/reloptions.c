@@ -93,7 +93,7 @@
  * value has no effect until the next VACUUM, so no need for stronger lock.
  */
 
-static session_local relopt_bool boolRelOpts[] =
+static static_singleton relopt_bool boolRelOpts[] =
 {
 	{
 		{
@@ -172,7 +172,7 @@ static session_local relopt_bool boolRelOpts[] =
 	{{NULL}}
 };
 
-static session_local relopt_int intRelOpts[] =
+static static_singleton relopt_int intRelOpts[] =
 {
 	{
 		{
@@ -387,7 +387,7 @@ static session_local relopt_int intRelOpts[] =
 	{{NULL}}
 };
 
-static session_local relopt_real realRelOpts[] =
+static static_singleton relopt_real realRelOpts[] =
 {
 	{
 		{
@@ -475,7 +475,7 @@ static session_local relopt_real realRelOpts[] =
 };
 
 /* values from StdRdOptIndexCleanup */
-static const relopt_enum_elt_def StdRdOptIndexCleanupValues[] =
+static static_singleton const relopt_enum_elt_def StdRdOptIndexCleanupValues[] =
 {
 	{"auto", STDRD_OPTION_VACUUM_INDEX_CLEANUP_AUTO},
 	{"on", STDRD_OPTION_VACUUM_INDEX_CLEANUP_ON},
@@ -490,7 +490,7 @@ static const relopt_enum_elt_def StdRdOptIndexCleanupValues[] =
 };
 
 /* values from GistOptBufferingMode */
-static const relopt_enum_elt_def gistBufferingOptValues[] =
+static static_singleton const relopt_enum_elt_def gistBufferingOptValues[] =
 {
 	{"auto", GIST_OPTION_BUFFERING_AUTO},
 	{"on", GIST_OPTION_BUFFERING_ON},
@@ -499,7 +499,7 @@ static const relopt_enum_elt_def gistBufferingOptValues[] =
 };
 
 /* values from ViewOptCheckOption */
-static const relopt_enum_elt_def viewCheckOptValues[] =
+static static_singleton const relopt_enum_elt_def viewCheckOptValues[] =
 {
 	/* no value for NOT_SET */
 	{"local", VIEW_OPTION_CHECK_OPTION_LOCAL},
@@ -507,7 +507,7 @@ static const relopt_enum_elt_def viewCheckOptValues[] =
 	{(const char *) NULL}		/* list terminator */
 };
 
-static session_local relopt_enum enumRelOpts[] =
+static static_singleton relopt_enum enumRelOpts[] =
 {
 	{
 		{
@@ -546,7 +546,7 @@ static session_local relopt_enum enumRelOpts[] =
 	{{NULL}}
 };
 
-static relopt_string stringRelOpts[] =
+static static_singleton relopt_string stringRelOpts[] =
 {
 	/* list terminator */
 	{{NULL}}

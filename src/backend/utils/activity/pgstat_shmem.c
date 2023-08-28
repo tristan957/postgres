@@ -59,7 +59,7 @@ static void pgstat_setup_memcxt(void);
 
 
 /* parameter for the shared hash */
-static const dshash_parameters dsh_params = {
+static static_singleton const dshash_parameters dsh_params = {
 	sizeof(PgStat_HashKey),
 	sizeof(PgStatShared_HashEntry),
 	pgstat_cmp_hash_key,

@@ -112,7 +112,7 @@ extern session_guc bool optimize_bounded_sort;
  * NOTE! Option values may not contain double quotes!
  */
 
-static const struct config_enum_entry bytea_output_options[] = {
+static static_singleton const struct config_enum_entry bytea_output_options[] = {
 	{"escape", BYTEA_OUTPUT_ESCAPE, false},
 	{"hex", BYTEA_OUTPUT_HEX, false},
 	{NULL, 0, false}
@@ -126,7 +126,7 @@ StaticAssertDecl(lengthof(bytea_output_options) == (BYTEA_OUTPUT_HEX + 2),
  * they sort slightly different (see "log" level), and because "fatal"/"panic"
  * aren't sensible for client_min_messages.
  */
-static const struct config_enum_entry client_message_level_options[] = {
+static static_singleton const struct config_enum_entry client_message_level_options[] = {
 	{"debug5", DEBUG5, false},
 	{"debug4", DEBUG4, false},
 	{"debug3", DEBUG3, false},
@@ -141,7 +141,7 @@ static const struct config_enum_entry client_message_level_options[] = {
 	{NULL, 0, false}
 };
 
-static const struct config_enum_entry server_message_level_options[] = {
+static static_singleton const struct config_enum_entry server_message_level_options[] = {
 	{"debug5", DEBUG5, false},
 	{"debug4", DEBUG4, false},
 	{"debug3", DEBUG3, false},
@@ -158,7 +158,7 @@ static const struct config_enum_entry server_message_level_options[] = {
 	{NULL, 0, false}
 };
 
-static const struct config_enum_entry intervalstyle_options[] = {
+static static_singleton const struct config_enum_entry intervalstyle_options[] = {
 	{"postgres", INTSTYLE_POSTGRES, false},
 	{"postgres_verbose", INTSTYLE_POSTGRES_VERBOSE, false},
 	{"sql_standard", INTSTYLE_SQL_STANDARD, false},
@@ -166,7 +166,7 @@ static const struct config_enum_entry intervalstyle_options[] = {
 	{NULL, 0, false}
 };
 
-static const struct config_enum_entry icu_validation_level_options[] = {
+static static_singleton const struct config_enum_entry icu_validation_level_options[] = {
 	{"disabled", -1, false},
 	{"debug5", DEBUG5, false},
 	{"debug4", DEBUG4, false},
@@ -185,7 +185,7 @@ static const struct config_enum_entry icu_validation_level_options[] = {
 StaticAssertDecl(lengthof(intervalstyle_options) == (INTSTYLE_ISO_8601 + 2),
 				 "array length mismatch");
 
-static const struct config_enum_entry log_error_verbosity_options[] = {
+static static_singleton const struct config_enum_entry log_error_verbosity_options[] = {
 	{"terse", PGERROR_TERSE, false},
 	{"default", PGERROR_DEFAULT, false},
 	{"verbose", PGERROR_VERBOSE, false},
@@ -195,7 +195,7 @@ static const struct config_enum_entry log_error_verbosity_options[] = {
 StaticAssertDecl(lengthof(log_error_verbosity_options) == (PGERROR_VERBOSE + 2),
 				 "array length mismatch");
 
-static const struct config_enum_entry log_statement_options[] = {
+static static_singleton const struct config_enum_entry log_statement_options[] = {
 	{"none", LOGSTMT_NONE, false},
 	{"ddl", LOGSTMT_DDL, false},
 	{"mod", LOGSTMT_MOD, false},
@@ -206,7 +206,7 @@ static const struct config_enum_entry log_statement_options[] = {
 StaticAssertDecl(lengthof(log_statement_options) == (LOGSTMT_ALL + 2),
 				 "array length mismatch");
 
-static const struct config_enum_entry isolation_level_options[] = {
+static static_singleton const struct config_enum_entry isolation_level_options[] = {
 	{"serializable", XACT_SERIALIZABLE, false},
 	{"repeatable read", XACT_REPEATABLE_READ, false},
 	{"read committed", XACT_READ_COMMITTED, false},
@@ -214,7 +214,7 @@ static const struct config_enum_entry isolation_level_options[] = {
 	{NULL, 0}
 };
 
-static const struct config_enum_entry session_replication_role_options[] = {
+static static_singleton const struct config_enum_entry session_replication_role_options[] = {
 	{"origin", SESSION_REPLICATION_ROLE_ORIGIN, false},
 	{"replica", SESSION_REPLICATION_ROLE_REPLICA, false},
 	{"local", SESSION_REPLICATION_ROLE_LOCAL, false},
@@ -224,7 +224,7 @@ static const struct config_enum_entry session_replication_role_options[] = {
 StaticAssertDecl(lengthof(session_replication_role_options) == (SESSION_REPLICATION_ROLE_LOCAL + 2),
 				 "array length mismatch");
 
-static const struct config_enum_entry syslog_facility_options[] = {
+static static_singleton const struct config_enum_entry syslog_facility_options[] = {
 #ifdef HAVE_SYSLOG
 	{"local0", LOG_LOCAL0, false},
 	{"local1", LOG_LOCAL1, false},
@@ -240,7 +240,7 @@ static const struct config_enum_entry syslog_facility_options[] = {
 	{NULL, 0}
 };
 
-static const struct config_enum_entry track_function_options[] = {
+static static_singleton const struct config_enum_entry track_function_options[] = {
 	{"none", TRACK_FUNC_OFF, false},
 	{"pl", TRACK_FUNC_PL, false},
 	{"all", TRACK_FUNC_ALL, false},
@@ -250,7 +250,7 @@ static const struct config_enum_entry track_function_options[] = {
 StaticAssertDecl(lengthof(track_function_options) == (TRACK_FUNC_ALL + 2),
 				 "array length mismatch");
 
-static const struct config_enum_entry stats_fetch_consistency[] = {
+static static_singleton const struct config_enum_entry stats_fetch_consistency[] = {
 	{"none", PGSTAT_FETCH_CONSISTENCY_NONE, false},
 	{"cache", PGSTAT_FETCH_CONSISTENCY_CACHE, false},
 	{"snapshot", PGSTAT_FETCH_CONSISTENCY_SNAPSHOT, false},
@@ -260,7 +260,7 @@ static const struct config_enum_entry stats_fetch_consistency[] = {
 StaticAssertDecl(lengthof(stats_fetch_consistency) == (PGSTAT_FETCH_CONSISTENCY_SNAPSHOT + 2),
 				 "array length mismatch");
 
-static const struct config_enum_entry xmlbinary_options[] = {
+static static_singleton const struct config_enum_entry xmlbinary_options[] = {
 	{"base64", XMLBINARY_BASE64, false},
 	{"hex", XMLBINARY_HEX, false},
 	{NULL, 0, false}
@@ -269,7 +269,7 @@ static const struct config_enum_entry xmlbinary_options[] = {
 StaticAssertDecl(lengthof(xmlbinary_options) == (XMLBINARY_HEX + 2),
 				 "array length mismatch");
 
-static const struct config_enum_entry xmloption_options[] = {
+static static_singleton const struct config_enum_entry xmloption_options[] = {
 	{"content", XMLOPTION_CONTENT, false},
 	{"document", XMLOPTION_DOCUMENT, false},
 	{NULL, 0, false}
@@ -282,7 +282,7 @@ StaticAssertDecl(lengthof(xmloption_options) == (XMLOPTION_CONTENT + 2),
  * Although only "on", "off", and "safe_encoding" are documented, we
  * accept all the likely variants of "on" and "off".
  */
-static const struct config_enum_entry backslash_quote_options[] = {
+static static_singleton const struct config_enum_entry backslash_quote_options[] = {
 	{"safe_encoding", BACKSLASH_QUOTE_SAFE_ENCODING, false},
 	{"on", BACKSLASH_QUOTE_ON, false},
 	{"off", BACKSLASH_QUOTE_OFF, false},
@@ -299,7 +299,7 @@ static const struct config_enum_entry backslash_quote_options[] = {
  * Although only "on", "off", and "auto" are documented, we accept
  * all the likely variants of "on" and "off".
  */
-static const struct config_enum_entry compute_query_id_options[] = {
+static static_singleton const struct config_enum_entry compute_query_id_options[] = {
 	{"auto", COMPUTE_QUERY_ID_AUTO, false},
 	{"regress", COMPUTE_QUERY_ID_REGRESS, false},
 	{"on", COMPUTE_QUERY_ID_ON, false},
@@ -317,7 +317,7 @@ static const struct config_enum_entry compute_query_id_options[] = {
  * Although only "on", "off", and "partition" are documented, we
  * accept all the likely variants of "on" and "off".
  */
-static const struct config_enum_entry constraint_exclusion_options[] = {
+static static_singleton const struct config_enum_entry constraint_exclusion_options[] = {
 	{"partition", CONSTRAINT_EXCLUSION_PARTITION, false},
 	{"on", CONSTRAINT_EXCLUSION_ON, false},
 	{"off", CONSTRAINT_EXCLUSION_OFF, false},
@@ -334,7 +334,7 @@ static const struct config_enum_entry constraint_exclusion_options[] = {
  * Although only "on", "off", "remote_apply", "remote_write", and "local" are
  * documented, we accept all the likely variants of "on" and "off".
  */
-static const struct config_enum_entry synchronous_commit_options[] = {
+static static_singleton const struct config_enum_entry synchronous_commit_options[] = {
 	{"local", SYNCHRONOUS_COMMIT_LOCAL_FLUSH, false},
 	{"remote_write", SYNCHRONOUS_COMMIT_REMOTE_WRITE, false},
 	{"remote_apply", SYNCHRONOUS_COMMIT_REMOTE_APPLY, false},
@@ -353,7 +353,7 @@ static const struct config_enum_entry synchronous_commit_options[] = {
  * Although only "on", "off", "try" are documented, we accept all the likely
  * variants of "on" and "off".
  */
-static const struct config_enum_entry huge_pages_options[] = {
+static static_singleton const struct config_enum_entry huge_pages_options[] = {
 	{"off", HUGE_PAGES_OFF, false},
 	{"on", HUGE_PAGES_ON, false},
 	{"try", HUGE_PAGES_TRY, false},
@@ -366,14 +366,14 @@ static const struct config_enum_entry huge_pages_options[] = {
 	{NULL, 0, false}
 };
 
-static const struct config_enum_entry huge_pages_status_options[] = {
+static static_singleton const struct config_enum_entry huge_pages_status_options[] = {
 	{"off", HUGE_PAGES_OFF, false},
 	{"on", HUGE_PAGES_ON, false},
 	{"unknown", HUGE_PAGES_UNKNOWN, false},
 	{NULL, 0, false}
 };
 
-static const struct config_enum_entry recovery_prefetch_options[] = {
+static static_singleton const struct config_enum_entry recovery_prefetch_options[] = {
 	{"off", RECOVERY_PREFETCH_OFF, false},
 	{"on", RECOVERY_PREFETCH_ON, false},
 	{"try", RECOVERY_PREFETCH_TRY, false},
@@ -386,7 +386,7 @@ static const struct config_enum_entry recovery_prefetch_options[] = {
 	{NULL, 0, false}
 };
 
-static const struct config_enum_entry debug_parallel_query_options[] = {
+static static_singleton const struct config_enum_entry debug_parallel_query_options[] = {
 	{"off", DEBUG_PARALLEL_OFF, false},
 	{"on", DEBUG_PARALLEL_ON, false},
 	{"regress", DEBUG_PARALLEL_REGRESS, false},
@@ -399,20 +399,20 @@ static const struct config_enum_entry debug_parallel_query_options[] = {
 	{NULL, 0, false}
 };
 
-static const struct config_enum_entry plan_cache_mode_options[] = {
+static static_singleton const struct config_enum_entry plan_cache_mode_options[] = {
 	{"auto", PLAN_CACHE_MODE_AUTO, false},
 	{"force_generic_plan", PLAN_CACHE_MODE_FORCE_GENERIC_PLAN, false},
 	{"force_custom_plan", PLAN_CACHE_MODE_FORCE_CUSTOM_PLAN, false},
 	{NULL, 0, false}
 };
 
-static const struct config_enum_entry password_encryption_options[] = {
+static static_singleton const struct config_enum_entry password_encryption_options[] = {
 	{"md5", PASSWORD_TYPE_MD5, false},
 	{"scram-sha-256", PASSWORD_TYPE_SCRAM_SHA_256, false},
 	{NULL, 0, false}
 };
 
-static const struct config_enum_entry ssl_protocol_versions_info[] = {
+static static_singleton const struct config_enum_entry ssl_protocol_versions_info[] = {
 	{"", PG_TLS_ANY, false},
 	{"TLSv1", PG_TLS1_VERSION, false},
 	{"TLSv1.1", PG_TLS1_1_VERSION, false},
@@ -421,7 +421,7 @@ static const struct config_enum_entry ssl_protocol_versions_info[] = {
 	{NULL, 0, false}
 };
 
-static const struct config_enum_entry debug_logical_replication_streaming_options[] = {
+static static_singleton const struct config_enum_entry debug_logical_replication_streaming_options[] = {
 	{"buffered", DEBUG_LOGICAL_REP_STREAMING_BUFFERED, false},
 	{"immediate", DEBUG_LOGICAL_REP_STREAMING_IMMEDIATE, false},
 	{NULL, 0, false}
@@ -430,7 +430,7 @@ static const struct config_enum_entry debug_logical_replication_streaming_option
 StaticAssertDecl(lengthof(ssl_protocol_versions_info) == (PG_TLS1_3_VERSION + 2),
 				 "array length mismatch");
 
-static const struct config_enum_entry recovery_init_sync_method_options[] = {
+static static_singleton const struct config_enum_entry recovery_init_sync_method_options[] = {
 	{"fsync", RECOVERY_INIT_SYNC_METHOD_FSYNC, false},
 #ifdef HAVE_SYNCFS
 	{"syncfs", RECOVERY_INIT_SYNC_METHOD_SYNCFS, false},
@@ -438,7 +438,7 @@ static const struct config_enum_entry recovery_init_sync_method_options[] = {
 	{NULL, 0, false}
 };
 
-static const struct config_enum_entry shared_memory_options[] = {
+static static_singleton const struct config_enum_entry shared_memory_options[] = {
 #ifndef WIN32
 	{"sysv", SHMEM_TYPE_SYSV, false},
 #endif
@@ -451,7 +451,7 @@ static const struct config_enum_entry shared_memory_options[] = {
 	{NULL, 0, false}
 };
 
-static const struct config_enum_entry default_toast_compression_options[] = {
+static static_singleton const struct config_enum_entry default_toast_compression_options[] = {
 	{"pglz", TOAST_PGLZ_COMPRESSION, false},
 #ifdef  USE_LZ4
 	{"lz4", TOAST_LZ4_COMPRESSION, false},
@@ -459,7 +459,7 @@ static const struct config_enum_entry default_toast_compression_options[] = {
 	{NULL, 0, false}
 };
 
-static const struct config_enum_entry wal_compression_options[] = {
+static static_singleton const struct config_enum_entry wal_compression_options[] = {
 	{"pglz", WAL_COMPRESSION_PGLZ, false},
 #ifdef USE_LZ4
 	{"lz4", WAL_COMPRESSION_LZ4, false},
@@ -481,11 +481,11 @@ static const struct config_enum_entry wal_compression_options[] = {
 /*
  * Options for enum values stored in other modules
  */
-extern const struct config_enum_entry wal_level_options[];
-extern const struct config_enum_entry archive_mode_options[];
-extern const struct config_enum_entry recovery_target_action_options[];
-extern const struct config_enum_entry sync_method_options[];
-extern const struct config_enum_entry dynamic_shared_memory_options[];
+extern static_singleton const struct config_enum_entry wal_level_options[];
+extern static_singleton const struct config_enum_entry archive_mode_options[];
+extern static_singleton const struct config_enum_entry recovery_target_action_options[];
+extern static_singleton const struct config_enum_entry sync_method_options[];
+extern static_singleton const struct config_enum_entry dynamic_shared_memory_options[];
 
 /*
  * GUC option variables that are exported from this module
@@ -624,7 +624,7 @@ bool		in_hot_standby_guc;
  *
  * Note: these strings are deliberately not localized.
  */
-const char *const GucContext_Names[] =
+static_singleton const char *const GucContext_Names[] =
 {
 	 /* PGC_INTERNAL */ "internal",
 	 /* PGC_POSTMASTER */ "postmaster",
@@ -643,7 +643,7 @@ StaticAssertDecl(lengthof(GucContext_Names) == (PGC_USERSET + 1),
  *
  * Note: these strings are deliberately not localized.
  */
-const char *const GucSource_Names[] =
+static_singleton const char *const GucSource_Names[] =
 {
 	 /* PGC_S_DEFAULT */ "default",
 	 /* PGC_S_DYNAMIC_DEFAULT */ "default",
@@ -667,7 +667,7 @@ StaticAssertDecl(lengthof(GucSource_Names) == (PGC_S_SESSION + 1),
 /*
  * Displayable names for the groupings defined in enum config_group
  */
-const char *const config_group_names[] =
+static_singleton const char *const config_group_names[] =
 {
 	/* UNGROUPED */
 	gettext_noop("Ungrouped"),
@@ -769,7 +769,7 @@ StaticAssertDecl(lengthof(config_group_names) == (DEVELOPER_OPTIONS + 2),
  *
  * Note: these strings are deliberately not localized.
  */
-const char *const config_type_names[] =
+static_singleton const char *const config_type_names[] =
 {
 	 /* PGC_BOOL */ "bool",
 	 /* PGC_INT */ "integer",
@@ -1212,7 +1212,7 @@ DEFINE_ENUM_GUC_ADDR(recovery_init_sync_method)
 DEFINE_ENUM_GUC_ADDR(debug_logical_replication_streaming)
 
 
-struct config_bool ConfigureNamesBool[] =
+static_singleton struct config_bool ConfigureNamesBool[] =
 {
 	{
 		{"enable_seqscan", PGC_USERSET, QUERY_TUNING_METHOD,
@@ -2412,7 +2412,7 @@ struct config_bool ConfigureNamesBool[] =
 };
 
 
-struct config_int ConfigureNamesInt[] =
+static_singleton struct config_int ConfigureNamesInt[] =
 {
 	{
 		{"archive_timeout", PGC_SIGHUP, WAL_ARCHIVING,
@@ -3909,7 +3909,7 @@ struct config_int ConfigureNamesInt[] =
 };
 
 
-struct config_real ConfigureNamesReal[] =
+static_singleton struct config_real ConfigureNamesReal[] =
 {
 	{
 		{"seq_page_cost", PGC_USERSET, QUERY_TUNING_COST,
@@ -4190,7 +4190,7 @@ struct config_real ConfigureNamesReal[] =
 };
 
 
-struct config_string ConfigureNamesString[] =
+static_singleton struct config_string ConfigureNamesString[] =
 {
 	{
 		{"archive_command", PGC_SIGHUP, WAL_ARCHIVING,
@@ -4953,7 +4953,7 @@ struct config_string ConfigureNamesString[] =
 };
 
 
-struct config_enum ConfigureNamesEnum[] =
+static_singleton struct config_enum ConfigureNamesEnum[] =
 {
 	{
 		{"backslash_quote", PGC_USERSET, COMPAT_OPTIONS_PREVIOUS,

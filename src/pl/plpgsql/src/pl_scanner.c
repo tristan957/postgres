@@ -63,11 +63,11 @@ session_local IdentifierLookup plpgsql_IdentifierLookup = IDENTIFIER_LOOKUP_NORM
 /* Token codes for PL/pgSQL keywords */
 #define PG_KEYWORD(kwname, value) value,
 
-static const uint16 ReservedPLKeywordTokens[] = {
+static static_singleton const uint16 ReservedPLKeywordTokens[] = {
 #include "pl_reserved_kwlist.h"
 };
 
-static const uint16 UnreservedPLKeywordTokens[] = {
+static static_singleton const uint16 UnreservedPLKeywordTokens[] = {
 #include "pl_unreserved_kwlist.h"
 };
 

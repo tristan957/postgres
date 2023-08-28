@@ -67,7 +67,7 @@ typedef struct f_smgr
 	void		(*smgr_immedsync) (SMgrRelation reln, ForkNumber forknum);
 } f_smgr;
 
-static const f_smgr smgrsw[] = {
+static static_singleton const f_smgr smgrsw[] = {
 	/* magnetic disk */
 	{
 		.smgr_init = mdinit,
@@ -89,7 +89,7 @@ static const f_smgr smgrsw[] = {
 	}
 };
 
-static const int NSmgr = lengthof(smgrsw);
+static static_singleton const int NSmgr = lengthof(smgrsw);
 
 /*
  * Each backend has a hashtable that stores all extant SMgrRelation objects.

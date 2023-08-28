@@ -126,7 +126,7 @@ struct cachedesc
 /* Macro to provide nkeys and key array with convenient syntax. */
 #define KEY(...) VA_ARGS_NARGS(__VA_ARGS__), { __VA_ARGS__ }
 
-static const struct cachedesc cacheinfo[] = {
+static static_singleton const struct cachedesc cacheinfo[] = {
 	[AGGFNOID] = {
 		AggregateRelationId,
 		AggregateFnoidIndexId,

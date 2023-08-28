@@ -85,7 +85,7 @@ static char *substitute_libpath_macro(const char *name);
 static char *find_in_dynamic_libpath(const char *basename);
 
 /* Magic structure that module needs to match to be accepted */
-static const Pg_magic_struct magic_data = PG_MODULE_MAGIC_DATA;
+static static_singleton const Pg_magic_struct magic_data = PG_MODULE_MAGIC_DATA;
 
 
 /*

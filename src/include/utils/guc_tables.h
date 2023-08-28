@@ -276,16 +276,11 @@ extern PGDLLIMPORT const char *const GucContext_Names[];
 extern PGDLLIMPORT const char *const GucSource_Names[];
 
 /* data arrays defining all the built-in GUC variables */
-#define ConfigureNamesBool BLESSED_ConfigureNamesBool
-extern PGDLLIMPORT struct config_bool ConfigureNamesBool[];
-#define ConfigureNamesInt BLESSED_ConfigureNamesInt
-extern PGDLLIMPORT struct config_int ConfigureNamesInt[];
-#define ConfigureNamesReal BLESSED_ConfigureNamesReal
-extern PGDLLIMPORT struct config_real ConfigureNamesReal[];
-#define ConfigureNamesString BLESSED_ConfigureNamesString
-extern PGDLLIMPORT struct config_string ConfigureNamesString[];
-#define ConfigureNamesEnum BLESSED_ConfigureNamesEnum
-extern PGDLLIMPORT struct config_enum ConfigureNamesEnum[];
+extern PGDLLIMPORT static_singleton struct config_bool ConfigureNamesBool[];
+extern PGDLLIMPORT static_singleton struct config_int ConfigureNamesInt[];
+extern PGDLLIMPORT static_singleton struct config_real ConfigureNamesReal[];
+extern PGDLLIMPORT static_singleton struct config_string ConfigureNamesString[];
+extern PGDLLIMPORT static_singleton struct config_enum ConfigureNamesEnum[];
 
 /* lookup GUC variables, returning config_generic pointers */
 extern struct config_generic *find_option(const char *name,

@@ -238,7 +238,7 @@ typedef struct SerializedTransactionState
  * block.  It will point to TopTransactionStateData when not in a
  * transaction at all, or when in a top-level transaction.
  */
-static TransactionStateData TopTransactionStateData = {
+static static_singleton TransactionStateData TopTransactionStateData = {
 	.state = TRANS_DEFAULT,
 	.blockState = TBLOCK_DEFAULT,
 	.topXidLogged = false,

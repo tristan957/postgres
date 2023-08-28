@@ -63,7 +63,7 @@ postmaster_guc int			max_locks_per_xact; /* set by guc.c */
  *
  * The conflict table defines the semantics of the various lock modes.
  */
-static const LOCKMASK LockConflicts[] = {
+static static_singleton const LOCKMASK LockConflicts[] = {
 	0,
 
 	/* AccessShareLock */
@@ -106,7 +106,7 @@ static const LOCKMASK LockConflicts[] = {
 };
 
 /* Names of lock modes, for debug printouts */
-static const char *const lock_mode_names[] =
+static static_singleton const char *const lock_mode_names[] =
 {
 	"INVALID",
 	"AccessShareLock",
@@ -123,7 +123,7 @@ static const char *const lock_mode_names[] =
 static bool Dummy_trace = false;
 #endif
 
-static const LockMethodData default_lockmethod = {
+static static_singleton const LockMethodData default_lockmethod = {
 	MaxLockMode,
 	LockConflicts,
 	lock_mode_names,
@@ -134,7 +134,7 @@ static const LockMethodData default_lockmethod = {
 #endif
 };
 
-static const LockMethodData user_lockmethod = {
+static static_singleton const LockMethodData user_lockmethod = {
 	MaxLockMode,
 	LockConflicts,
 	lock_mode_names,
@@ -148,7 +148,7 @@ static const LockMethodData user_lockmethod = {
 /*
  * map from lock method id to the lock table data structures
  */
-static const LockMethod LockMethods[] = {
+static static_singleton const LockMethod LockMethods[] = {
 	NULL,
 	&default_lockmethod,
 	&user_lockmethod

@@ -79,7 +79,7 @@ typedef struct
 	int			sqlerrstate;
 } ExceptionLabelMap;
 
-static const ExceptionLabelMap exception_label_map[] = {
+static static_singleton const ExceptionLabelMap exception_label_map[] = {
 #include "plerrcodes.h"			/* pgrminclude ignore */
 	{NULL, 0}
 };

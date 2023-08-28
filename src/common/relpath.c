@@ -30,7 +30,7 @@
  * forkname_to_number() below, and update the SGML documentation for
  * pg_relation_size().
  */
-const char *const forkNames[] = {
+static_singleton const char *const forkNames[] = {
 	"main",						/* MAIN_FORKNUM */
 	"fsm",						/* FSM_FORKNUM */
 	"vm",						/* VISIBILITYMAP_FORKNUM */

@@ -241,7 +241,7 @@ struct dropmsgstrings
 	const char *drophint_msg;
 };
 
-static const struct dropmsgstrings dropmsgstringarray[] = {
+static static_singleton const struct dropmsgstrings dropmsgstringarray[] = {
 	{RELKIND_RELATION,
 		ERRCODE_UNDEFINED_TABLE,
 		gettext_noop("table \"%s\" does not exist"),

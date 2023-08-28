@@ -115,7 +115,7 @@ static int	scram_exchange(void *opaq, const char *input, int inputlen,
 						   const char **logdetail);
 
 /* Mechanism declaration */
-const pg_be_sasl_mech pg_be_scram_mech = {
+static_singleton const pg_be_sasl_mech pg_be_scram_mech = {
 	scram_get_mechanisms,
 	scram_init,
 	scram_exchange

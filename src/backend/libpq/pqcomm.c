@@ -125,7 +125,7 @@ static int	internal_flush(void);
 static int	Lock_AF_UNIX(const char *unixSocketDir, const char *unixSocketPath);
 static int	Setup_AF_UNIX(const char *sock_path);
 
-static const PQcommMethods PqCommSocketMethods = {
+static static_singleton const PQcommMethods PqCommSocketMethods = {
 	.comm_reset = socket_comm_reset,
 	.flush = socket_flush,
 	.flush_if_writable = socket_flush_if_writable,
@@ -134,7 +134,7 @@ static const PQcommMethods PqCommSocketMethods = {
 	.putmessage_noblock = socket_putmessage_noblock
 };
 
-const PQcommMethods *PqCommMethods = &PqCommSocketMethods;
+static_singleton const PQcommMethods *PqCommMethods = &PqCommSocketMethods;
 
 WaitEventSet *FeBeWaitSet;
 

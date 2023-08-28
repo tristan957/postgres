@@ -36,7 +36,7 @@ static bool mq_is_send_pending(void);
 static int	mq_putmessage(char msgtype, const char *s, size_t len);
 static void mq_putmessage_noblock(char msgtype, const char *s, size_t len);
 
-static const PQcommMethods PqCommMqMethods = {
+static static_singleton const PQcommMethods PqCommMqMethods = {
 	.comm_reset = mq_comm_reset,
 	.flush = mq_flush,
 	.flush_if_writable = mq_flush_if_writable,

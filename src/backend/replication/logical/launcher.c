@@ -84,7 +84,7 @@ typedef struct LauncherLastStartTimesEntry
 } LauncherLastStartTimesEntry;
 
 /* parameters for the last-start-times shared hash table */
-static const dshash_parameters dsh_params = {
+static static_singleton const dshash_parameters dsh_params = {
 	sizeof(Oid),
 	sizeof(LauncherLastStartTimesEntry),
 	dshash_memcmp,

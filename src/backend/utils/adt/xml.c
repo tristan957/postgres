@@ -210,7 +210,7 @@ static Datum XmlTableGetValue(struct TableFuncScanState *state, int colnum,
 							  Oid typid, int32 typmod, bool *isnull);
 static void XmlTableDestroyOpaque(struct TableFuncScanState *state);
 
-const TableFuncRoutine XmlTableRoutine =
+static_singleton const TableFuncRoutine XmlTableRoutine =
 {
 	XmlTableInitOpaque,
 	XmlTableSetDocument,

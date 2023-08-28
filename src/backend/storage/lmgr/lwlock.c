@@ -129,9 +129,9 @@ StaticAssertDecl(LW_VAL_EXCLUSIVE > (uint32) MAX_BACKENDS,
  * All these names are user-visible as wait event names, so choose with care
  * ... and do not forget to update the documentation's list of wait events.
  */
-extern const char *const IndividualLWLockNames[];	/* in lwlocknames.c */
+extern static_singleton const char *const IndividualLWLockNames[];	/* in lwlocknames.c */
 
-static const char *const BuiltinTrancheNames[] = {
+static static_singleton const char *const BuiltinTrancheNames[] = {
 	/* LWTRANCHE_XACT_BUFFER: */
 	"XactBuffer",
 	/* LWTRANCHE_COMMITTS_BUFFER: */

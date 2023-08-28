@@ -138,7 +138,7 @@ static Node *cookConstraint(ParseState *pstate,
  * to zeroes are also not mentioned.
  */
 
-static const FormData_pg_attribute a1 = {
+static static_singleton const FormData_pg_attribute a1 = {
 	.attname = {"ctid"},
 	.atttypid = TIDOID,
 	.attlen = sizeof(ItemPointerData),
@@ -152,7 +152,7 @@ static const FormData_pg_attribute a1 = {
 	.attislocal = true,
 };
 
-static const FormData_pg_attribute a2 = {
+static static_singleton const FormData_pg_attribute a2 = {
 	.attname = {"xmin"},
 	.atttypid = XIDOID,
 	.attlen = sizeof(TransactionId),
@@ -166,7 +166,7 @@ static const FormData_pg_attribute a2 = {
 	.attislocal = true,
 };
 
-static const FormData_pg_attribute a3 = {
+static static_singleton const FormData_pg_attribute a3 = {
 	.attname = {"cmin"},
 	.atttypid = CIDOID,
 	.attlen = sizeof(CommandId),
@@ -180,7 +180,7 @@ static const FormData_pg_attribute a3 = {
 	.attislocal = true,
 };
 
-static const FormData_pg_attribute a4 = {
+static static_singleton const FormData_pg_attribute a4 = {
 	.attname = {"xmax"},
 	.atttypid = XIDOID,
 	.attlen = sizeof(TransactionId),
@@ -194,7 +194,7 @@ static const FormData_pg_attribute a4 = {
 	.attislocal = true,
 };
 
-static const FormData_pg_attribute a5 = {
+static static_singleton const FormData_pg_attribute a5 = {
 	.attname = {"cmax"},
 	.atttypid = CIDOID,
 	.attlen = sizeof(CommandId),
@@ -214,7 +214,7 @@ static const FormData_pg_attribute a5 = {
  * table of a particular class/type. In any case table is still the word
  * used in SQL.
  */
-static const FormData_pg_attribute a6 = {
+static static_singleton const FormData_pg_attribute a6 = {
 	.attname = {"tableoid"},
 	.atttypid = OIDOID,
 	.attlen = sizeof(Oid),
@@ -228,7 +228,7 @@ static const FormData_pg_attribute a6 = {
 	.attislocal = true,
 };
 
-static const FormData_pg_attribute *SysAtt[] = {&a1, &a2, &a3, &a4, &a5, &a6};
+static static_singleton const FormData_pg_attribute *SysAtt[] = {&a1, &a2, &a3, &a4, &a5, &a6};
 
 /*
  * This function returns a Form_pg_attribute pointer for a system attribute.

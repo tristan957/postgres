@@ -114,7 +114,7 @@ static BackgroundWorkerArray *BackgroundWorkerData;
  * List of internal background worker entry points.  We need this for
  * reasons explained in LookupBackgroundWorkerFunction(), below.
  */
-static const struct
+static static_singleton const struct
 {
 	const char *fn_name;
 	bgworker_main_type fn_addr;

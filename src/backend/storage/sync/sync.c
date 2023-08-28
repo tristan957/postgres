@@ -97,7 +97,7 @@ typedef struct SyncOps
 /*
  * These indexes must correspond to the values of the SyncRequestHandler enum.
  */
-static const SyncOps syncsw[] = {
+static static_singleton const SyncOps syncsw[] = {
 	/* magnetic disk */
 	[SYNC_HANDLER_MD] = {
 		.sync_syncfiletag = mdsyncfiletag,

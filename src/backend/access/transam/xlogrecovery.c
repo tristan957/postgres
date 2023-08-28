@@ -72,7 +72,7 @@
 /*
  * GUC support
  */
-const struct config_enum_entry recovery_target_action_options[] = {
+static_singleton const struct config_enum_entry recovery_target_action_options[] = {
 	{"pause", RECOVERY_TARGET_ACTION_PAUSE, false},
 	{"promote", RECOVERY_TARGET_ACTION_PROMOTE, false},
 	{"shutdown", RECOVERY_TARGET_ACTION_SHUTDOWN, false},
@@ -216,7 +216,7 @@ typedef enum
 } XLogSource;
 
 /* human-readable names for XLogSources, for debugging output */
-static const char *const xlogSourceNames[] = {"any", "archive", "pg_wal", "stream"};
+static static_singleton const char *const xlogSourceNames[] = {"any", "archive", "pg_wal", "stream"};
 
 /*
  * readFile is -1 or a kernel FD for the log file segment that's currently

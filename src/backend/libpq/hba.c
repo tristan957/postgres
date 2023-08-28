@@ -103,7 +103,7 @@ static MemoryContext parsed_ident_context = NULL;
  *
  * Note: keep this in sync with the UserAuth enum in hba.h.
  */
-static const char *const UserAuthName[] =
+static static_singleton const char *const UserAuthName[] =
 {
 	"reject",
 	"implicit reject",			/* Not a user-visible option */

@@ -28,7 +28,8 @@ print $h $autogen;
 print $h "/* there is deliberately not an #ifndef LWLOCKNAMES_H here */\n\n";
 print $c $autogen, "\n";
 
-print $c "const char *const IndividualLWLockNames[] = {";
+print $c "#include \"postgres.h\"\n\n";
+print $c "static_singleton const char *const IndividualLWLockNames[] = {";
 
 while (<$lwlocknames>)
 {

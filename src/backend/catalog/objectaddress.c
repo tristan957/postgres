@@ -119,7 +119,7 @@ typedef struct
 									 * object of this class? */
 } ObjectPropertyType;
 
-static const ObjectPropertyType ObjectProperty[] =
+static static_singleton const ObjectPropertyType ObjectProperty[] =
 {
 	{
 		"access method",
@@ -650,7 +650,7 @@ static const ObjectPropertyType ObjectProperty[] =
  *
  * To ease maintenance, this follows the order of getObjectTypeDescription.
  */
-static const struct object_type_map
+static static_singleton const struct object_type_map
 {
 	const char *tm_name;
 	ObjectType	tm_type;
@@ -878,7 +878,7 @@ static const struct object_type_map
 	}
 };
 
-const ObjectAddress InvalidObjectAddress =
+static_singleton const ObjectAddress InvalidObjectAddress =
 {
 	InvalidOid,
 	InvalidOid,

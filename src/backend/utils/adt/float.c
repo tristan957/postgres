@@ -58,16 +58,11 @@ static float8 cot_45 = 0;
  * compiler to know that, else it might try to precompute expressions
  * involving them.  See comments for init_degree_constants().
  */
-#define degree_c_thirty BLESSED_degree_c_thirty
-#define degree_c_forty_five BLESSED_degree_c_forty_five
-#define degree_c_sixty BLESSED_degree_c_sixty
-#define degree_c_one_half BLESSED_degree_c_one_half
-#define degree_c_one BLESSED_degree_c_one
-float8		degree_c_thirty = 30.0;
-float8		degree_c_forty_five = 45.0;
-float8		degree_c_sixty = 60.0;
-float8		degree_c_one_half = 0.5;
-float8		degree_c_one = 1.0;
+static_singleton float8		degree_c_thirty = 30.0;
+static_singleton float8		degree_c_forty_five = 45.0;
+static_singleton float8		degree_c_sixty = 60.0;
+static_singleton float8		degree_c_one_half = 0.5;
+static_singleton float8		degree_c_one = 1.0;
 
 /* State for drandom() and setseed() */
 static bool drandom_seed_set = false;

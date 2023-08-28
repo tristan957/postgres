@@ -92,7 +92,7 @@ static bool dsm_impl_mmap(dsm_op op, dsm_handle handle, Size request_size,
 #endif
 static int	errcode_for_dynamic_shared_memory(void);
 
-const struct config_enum_entry dynamic_shared_memory_options[] = {
+static_singleton const struct config_enum_entry dynamic_shared_memory_options[] = {
 #ifdef USE_DSM_POSIX
 	{"posix", DSM_IMPL_POSIX, false},
 #endif

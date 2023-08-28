@@ -36,7 +36,7 @@ typedef struct pg_encname
 	pg_enc		encoding;
 } pg_encname;
 
-static const pg_encname pg_encname_tbl[] =
+static static_singleton const pg_encname pg_encname_tbl[] =
 {
 	{
 		"abc", PG_WIN1258
@@ -306,7 +306,7 @@ static const pg_encname pg_encname_tbl[] =
 #define DEF_ENC2NAME(name, codepage) { #name, PG_##name, codepage }
 #endif
 
-const pg_enc2name pg_enc2name_tbl[] =
+static_singleton const pg_enc2name pg_enc2name_tbl[] =
 {
 	DEF_ENC2NAME(SQL_ASCII, 0),
 	DEF_ENC2NAME(EUC_JP, 20932),
@@ -358,7 +358,7 @@ const pg_enc2name pg_enc2name_tbl[] =
  * This covers all encodings except MULE_INTERNAL, which is alien to gettext.
  * ----------
  */
-const pg_enc2gettext pg_enc2gettext_tbl[] =
+const static_singleton pg_enc2gettext pg_enc2gettext_tbl[] =
 {
 	{PG_SQL_ASCII, "US-ASCII"},
 	{PG_UTF8, "UTF-8"},
@@ -412,7 +412,7 @@ const pg_enc2gettext pg_enc2gettext_tbl[] =
  *
  * NULL entries are not supported by ICU, or their mapping is unclear.
  */
-static const char *const pg_enc2icu_tbl[] =
+static static_singleton const char *const pg_enc2icu_tbl[] =
 {
 	NULL,						/* PG_SQL_ASCII */
 	"EUC-JP",					/* PG_EUC_JP */

@@ -396,7 +396,7 @@ typedef struct JsonPathKeyword
  * Array of key words should be sorted by length and then
  * alphabetical order
  */
-static const JsonPathKeyword keywords[] = {
+static static_singleton const JsonPathKeyword keywords[] = {
 	{ 2, false,	IS_P,		"is"},
 	{ 2, false,	TO_P,		"to"},
 	{ 3, false,	ABS_P,		"abs"},

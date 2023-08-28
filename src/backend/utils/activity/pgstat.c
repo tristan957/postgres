@@ -257,7 +257,7 @@ static session_local bool pgstat_is_shutdown = false;
  * seem to be a great way of doing that, given the split across multiple
  * files.
  */
-static const PgStat_KindInfo pgstat_kind_infos[PGSTAT_NUM_KINDS] = {
+static static_singleton const PgStat_KindInfo pgstat_kind_infos[PGSTAT_NUM_KINDS] = {
 
 	/* stats kinds for variable-numbered objects */
 

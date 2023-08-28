@@ -42,7 +42,7 @@ static Size BogusGetChunkSpace(void *pointer);
  *	  GLOBAL MEMORY															 *
  *****************************************************************************/
 
-static const MemoryContextMethods mcxt_methods[] = {
+static static_singleton const MemoryContextMethods mcxt_methods[] = {
 	/* aset.c */
 	[MCTX_ASET_ID].alloc = AllocSetAlloc,
 	[MCTX_ASET_ID].free_p = AllocSetFree,

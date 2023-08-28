@@ -78,7 +78,7 @@ session_guc bool		standard_conforming_strings = true;
  */
 #define PG_KEYWORD(kwname, value, category, collabel) value,
 
-const uint16 ScanKeywordTokens[] = {
+const static_singleton uint16 ScanKeywordTokens[] = {
 #include "parser/kwlist.h"
 };
 

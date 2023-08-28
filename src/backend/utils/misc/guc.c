@@ -110,9 +110,9 @@ typedef struct
 #error XLOG_BLCKSZ must be between 1KB and 1MB
 #endif
 
-static const char *memory_units_hint = gettext_noop("Valid units for this parameter are \"B\", \"kB\", \"MB\", \"GB\", and \"TB\".");
+static static_singleton const char *memory_units_hint = gettext_noop("Valid units for this parameter are \"B\", \"kB\", \"MB\", \"GB\", and \"TB\".");
 
-static const unit_conversion memory_unit_conversion_table[] =
+static static_singleton const unit_conversion memory_unit_conversion_table[] =
 {
 	{"TB", GUC_UNIT_BYTE, 1024.0 * 1024.0 * 1024.0 * 1024.0},
 	{"GB", GUC_UNIT_BYTE, 1024.0 * 1024.0 * 1024.0},
@@ -147,9 +147,9 @@ static const unit_conversion memory_unit_conversion_table[] =
 	{""}						/* end of table marker */
 };
 
-static const char *time_units_hint = gettext_noop("Valid units for this parameter are \"us\", \"ms\", \"s\", \"min\", \"h\", and \"d\".");
+static static_singleton const char *time_units_hint = gettext_noop("Valid units for this parameter are \"us\", \"ms\", \"s\", \"min\", \"h\", and \"d\".");
 
-static const unit_conversion time_unit_conversion_table[] =
+static static_singleton const unit_conversion time_unit_conversion_table[] =
 {
 	{"d", GUC_UNIT_MS, 1000 * 60 * 60 * 24},
 	{"h", GUC_UNIT_MS, 1000 * 60 * 60},
@@ -181,7 +181,7 @@ static const unit_conversion time_unit_conversion_table[] =
  * should be mapped to a new one only if the new variable has very similar
  * semantics to the old.
  */
-static const char *const map_old_guc_names[] = {
+static static_singleton const char *const map_old_guc_names[] = {
 	"sort_mem", "work_mem",
 	"vacuum_mem", "maintenance_work_mem",
 	NULL
