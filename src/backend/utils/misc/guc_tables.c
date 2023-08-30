@@ -944,6 +944,7 @@ DEFINE_BOOL_GUC_ADDR(jit_profiling_support)
 DEFINE_BOOL_GUC_ADDR(jit_tuple_deforming)
 DEFINE_BOOL_GUC_ADDR(data_sync_retry)
 DEFINE_BOOL_GUC_ADDR(wal_receiver_create_temp_slot)
+DEFINE_BOOL_GUC_ADDR(IsMultiThreaded)
 DEFINE_INT_GUC_ADDR(XLogArchiveTimeout)
 DEFINE_INT_GUC_ADDR(PostAuthDelay)
 DEFINE_INT_GUC_ADDR(default_statistics_target)
@@ -2400,6 +2401,17 @@ static_singleton struct config_bool ConfigureNamesBool[] =
 			gettext_noop("Sets whether a WAL receiver should create a temporary replication slot if no permanent slot is configured."),
 		},
 		GUC_ADDR(wal_receiver_create_temp_slot),
+		false,
+		NULL, NULL, NULL
+	},
+
+	{
+		{"multithreaded", PGC_POSTMASTER, UNGROUPED,
+			gettext_noop("Instead of a process model, use a multi-threaded model"),
+			NULL,
+			GUC_SUPERUSER_ONLY | GUC_NO_RESET_ALL | GUC_NO_RESET
+		},
+		GUC_ADDR(IsMultiThreaded),
 		false,
 		NULL, NULL, NULL
 	},
