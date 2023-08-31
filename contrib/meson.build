@@ -56,7 +56,7 @@ subdir('seg')
 subdir('sepgsql')
 subdir('spi')
 subdir('sslinfo')
-# start-scripts doesn't contain build products
+# start-scripts that do not contain build products
 subdir('tablefunc')
 subdir('tcn')
 subdir('test_decoding')
