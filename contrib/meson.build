@@ -1,6 +1,8 @@
 # Copyright (c) 2022-2023, PostgreSQL Global Development Group
 
-contrib_mod_args = pg_mod_args
+# These will get built during test runs or if the contrib target is ran.
+contrib_bin_args = default_bin_args + { 'build_by_default': false }
+contrib_mod_args = pg_mod_args + { 'build_by_default': false }
 
 contrib_data_dir = dir_data_extension
 contrib_data_args = {
