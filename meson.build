@@ -385,47 +385,50 @@ install_files = files('src/tools/install_files')
 # Path to meson (for tests etc)
 ###############################################################
 
-# NB: this should really be part of meson, see
-# https://github.com/mesonbuild/meson/issues/8511
-meson_binpath_r = run_command(python, 'src/tools/find_meson', check: true)
+if meson.version().version_compare('>= 1.2.0')
+  meson_bin = find_program('meson', native: true)
+  meson_args = []
+else
+  meson_binpath_r = run_command(python, 'src/tools/find_meson', check: true)
 
-if meson_binpath_r.stdout() == ''
-  error('huh, could not run find_meson.\nerrcode: @0@\nstdout: @1@\nstderr: @2@'.format(
-    meson_binpath_r.returncode(),
-    meson_binpath_r.stdout(),
-    meson_binpath_r.stderr()))
-endif
-
-meson_binpath_s = meson_binpath_r.stdout().split('\n')
-meson_binpath_len = meson_binpath_s.length()
-
-if meson_binpath_len < 1
-  error('unexpected introspect line @0@'.format(meson_binpath_r.stdout()))
-endif
-
-i = 0
-meson_impl = ''
-meson_binpath = ''
-meson_args = []
-foreach e : meson_binpath_s
-  if i == 0
-    meson_impl = e
-  elif i == 1
-    meson_binpath = e
-  else
-    meson_args += e
+  if meson_binpath_r.stdout() == ''
+    error('huh, could not run find_meson.\nerrcode: @0@\nstdout: @1@\nstderr: @2@'.format(
+      meson_binpath_r.returncode(),
+      meson_binpath_r.stdout(),
+      meson_binpath_r.stderr()))
   endif
-  i += 1
-endforeach
 
-if meson_impl not in ['muon', 'meson']
-  error('unknown meson implementation "@0@"'.format(meson_impl))
-endif
+  meson_binpath_s = meson_binpath_r.stdout().split('\n')
+  meson_binpath_len = meson_binpath_s.length()
 
-meson_bin = find_program(meson_binpath, native: true)
-# Use the muon CLI compat layer
-if meson_impl == 'muon'
-  meson_args += 'meson'
+  if meson_binpath_len < 1
+    error('unexpected introspect line @0@'.format(meson_binpath_r.stdout()))
+  endif
+
+  i = 0
+  meson_impl = ''
+  meson_binpath = ''
+  meson_args = []
+  foreach e : meson_binpath_s
+    if i == 0
+      meson_impl = e
+    elif i == 1
+      meson_binpath = e
+    else
+      meson_args += e
+    endif
+    i += 1
+  endforeach
+
+  if meson_impl not in ['muon', 'meson']
+    error('unknown meson implementation "@0@"'.format(meson_impl))
+  endif
+
+  meson_bin = find_program(meson_binpath, native: true)
+  # Use the muon CLI compat layer
+  if meson_impl == 'muon'
+    meson_args += 'meson'
+  endif
 endif
 
 
