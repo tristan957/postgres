@@ -45,20 +45,20 @@ test_install_libs += regress_module
 
 # Get some extra C modules from contrib/spi but mark them as not to be
 # installed.
-# FIXME: avoid the duplication.
 
-autoinc_regress = shared_module('autoinc',
-  ['../../../contrib/spi/autoinc.c'],
-  kwargs: pg_test_mod_args,
-)
-test_install_libs += autoinc_regress
+extra_regress_modules = {
+  'autoinc': {},
+  'refint': {
+    'c_args': refint_cflags,
+  },
+}
 
-refint_regress = shared_module('refint',
-  ['../../../contrib/spi/refint.c'],
-  c_args: refint_cflags,
-  kwargs: pg_test_mod_args,
-)
-test_install_libs += refint_regress
+foreach m, params : extra_regress_modules
+  test_install_libs += shared_module(m,
+    '../../../contrib/spi/@0@.c'.format(m),
+    kwargs: pg_test_mod_args + params
+  )
+endforeach
 
 
 tests += {
