@@ -423,6 +423,10 @@ if meson_impl not in ['muon', 'meson']
 endif
 
 meson_bin = find_program(meson_binpath, native: true)
+# Use the muon CLI compat layer
+if meson_impl == 'muon'
+  meson_args += 'meson'
+endif
 
 
 
@@ -3038,10 +3042,7 @@ else
   test_install_location = run_command(command, check: true).stdout().strip()
 endif
 
-meson_install_args = meson_args + ['install'] + {
-    'meson': ['--quiet', '--only-changed', '--no-rebuild'],
-    'muon': []
-}[meson_impl]
+meson_install_args = meson_args + ['install', '--quiet', '--only-changed', '--no-rebuild']
 
 # setup tests should be run first,
 # so define priority for these
