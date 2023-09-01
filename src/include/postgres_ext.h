@@ -37,6 +37,19 @@
 #define session_local __thread
 #endif
 
+#define DEFINE_BOOL_GUC_ADDR(guc) \
+	static bool *guc##_address(void) { return &guc; }
+#define DEFINE_INT_GUC_ADDR(guc) \
+	static int *guc##_address(void) { return &guc; }
+#define DEFINE_REAL_GUC_ADDR(guc) \
+	static float8 *guc##_address(void) { return &guc; }
+#define DEFINE_STRING_GUC_ADDR(guc) \
+	static char **guc##_address(void) { return &guc; }
+#define DEFINE_ENUM_GUC_ADDR(guc) \
+	static int *guc##_address(void) { return &guc; }
+
+#define GUC_ADDR(guc) &guc##_address
+
 /*
  * Object ID is a fundamental type in Postgres.
  */
