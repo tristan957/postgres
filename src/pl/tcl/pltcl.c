@@ -331,6 +331,9 @@ static HeapTuple pltcl_build_tuple_result(Tcl_Interp *interp,
 static void pltcl_init_tuple_store(pltcl_call_state *call_state);
 
 
+DEFINE_STRING_GUC_ADDR(pltcl_start_proc)
+DEFINE_STRING_GUC_ADDR(pltclu_start_proc)
+
 /*
  * Hack to override Tcl's builtin Notifier subsystem.  This prevents the
  * backend from becoming multithreaded, which breaks all sorts of things.
@@ -461,14 +464,14 @@ _PG_init(void)
 	DefineCustomStringVariable("pltcl.start_proc",
 							   gettext_noop("PL/Tcl function to call once when pltcl is first used."),
 							   NULL,
-							   &pltcl_start_proc,
+							   GUC_ADDR(pltcl_start_proc),
 							   NULL,
 							   PGC_SUSET, 0,
 							   NULL, NULL, NULL);
 	DefineCustomStringVariable("pltclu.start_proc",
 							   gettext_noop("PL/TclU function to call once when pltclu is first used."),
 							   NULL,
-							   &pltclu_start_proc,
+							   GUC_ADDR(pltclu_start_proc),
 							   NULL,
 							   PGC_SUSET, 0,
 							   NULL, NULL, NULL);

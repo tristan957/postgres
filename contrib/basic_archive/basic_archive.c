@@ -62,6 +62,8 @@ static const ArchiveModuleCallbacks basic_archive_callbacks = {
 	.shutdown_cb = basic_archive_shutdown
 };
 
+DEFINE_STRING_GUC_ADDR(archive_directory)
+
 /*
  * _PG_init
  *
@@ -73,7 +75,7 @@ _PG_init(void)
 	DefineCustomStringVariable("basic_archive.archive_directory",
 							   gettext_noop("Archive file destination directory."),
 							   NULL,
-							   &archive_directory,
+							   GUC_ADDR(archive_directory),
 							   "",
 							   PGC_SIGHUP,
 							   0,
