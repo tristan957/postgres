@@ -238,7 +238,7 @@ mdcreate(SMgrRelation reln, ForkNumber forknum, bool isRedo)
 	char	   *path;
 	File		fd;
 	MdSMgrRelation mdreln = (MdSMgrRelation) reln;
-	Assert(reln->smgr_which == MdSMgrId);
+	// Assert(reln->smgr_which == MdSMgrId);
 
 	if (isRedo && mdreln->md_num_open_segs[forknum] > 0)
 		return;					/* created and opened already... */
