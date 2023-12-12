@@ -38,12 +38,12 @@ do
 	if [ "$system" = Linux ]
 	then
 		objdump -W "$DIR"/* |
-		grep -E -A3 '\(DW_TAG_typedef\)' |
+		grep -F -A3 DW_TAG_typedef |
 		awk ' $2 == "DW_AT_name" {print $NF}'
 	elif [ "$system" = FreeBSD ]
 	then
 		readelf -w "$DIR"/* |
-		grep -E -A3 '\(DW_TAG_typedef\)' |
+		grep -F -A3 DW_TAG_typedef |
 		awk ' $1 == "DW_AT_name" {print $NF}'
 	elif [ "$system" = Darwin ]
 	then
