@@ -45,6 +45,17 @@ do
 		readelf -w "$DIR"/* |
 		grep -E -A3 '\(DW_TAG_typedef\)' |
 		awk ' $1 == "DW_AT_name" {print $NF}'
+	elif [ "$system" = Darwin ]
+	then
+		# Creates *.dwarf files that we will remove later
+		dsymutil --flat "$DIR"/*
+
+		# Apple's dwarfdump, wraps types: ("example")
+		dwarfdump "$DIR"/*.dwarf |
+		grep -F -A3 'DW_TAG_typedef' |
+		awk ' $1 == "DW_AT_name" {print substr($NF, 3, length($NF) - 4)}'
+
+		rm -f "$DIR"/*.dwarf
 	fi
 done |
 grep -v ' ' | # some typedefs have spaces, remove them
