@@ -64,14 +64,14 @@ compile_file() {
 	[ "$INCLUDE" = "pg_config.h" ] && continue
 	[ "$INCLUDE" = "c.h" ] && continue
 	# Stringify macros will expand undefined identifiers, so skip files that use it
-	egrep -q '\<(CppAsString2?|CppConcat)\>' "$FILE" && continue
+	grep -E -q '\<(CppAsString2?|CppConcat)\>' "$FILE" && continue
 
 	# preserve configure-specific includes
 	# these includes are surrounded by #ifdef's
 	grep -B1 '^#include[ 	][ 	]*[<"]'"$INCLUDE"'[>"]' "$FILE" |
-	     egrep -q '^#if|^#else|^#elif' && continue
+	     grep -E -q '^#if|^#else|^#elif' && continue
 	grep -A1 '^#include[ 	][ 	]*[<"]'"$INCLUDE"'[>"]' "$FILE" |
-	     egrep -q '^#else|^#elif|^#endif' && continue
+	     grep -E -q '^#else|^#elif|^#endif' && continue
 
         # Remove all #if and #ifdef blocks because the blocks
 	# might contain code that is not compiled on this platform.
