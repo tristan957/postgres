@@ -26,7 +26,7 @@
 #    http://www.informatik.uni-frankfurt.de/doc/texi/stabs_toc.html
 
 
-if [ "$#" -eq 0 -o ! -d "$1" ]
+if [ "$#" -eq 0 ] || [ ! -d "$1" ]
 then	echo "Usage:  $0 postgres_binary_directory [...]" 1>&2
 	exit 1
 fi
