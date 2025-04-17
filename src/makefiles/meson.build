@@ -31,7 +31,6 @@ if not working_strip
   strip_shared_cmd = [':']
 endif
 
-
 pgxs_kv = {
   'PACKAGE_URL': pg_url,
   'PACKAGE_VERSION': pg_version,
@@ -119,16 +118,20 @@ pgxs_kv = {
   'LIBS': var_libs,
 }
 
+if have_cpp
+  pgxs_kv += {
+    'CXX': ' '.join(cpp.cmd_array()),
+  }
+endif
+
 if llvm.found()
   pgxs_kv += {
     'CLANG': clang.full_path(),
-    'CXX': ' '.join(cpp.cmd_array()),
     'LLVM_BINPATH': llvm_binpath,
   }
 else
   pgxs_kv += {
     'CLANG': '',
-    'CXX': '',
     'LLVM_BINPATH': '',
   }
 endif

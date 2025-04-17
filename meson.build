@@ -41,6 +41,10 @@ build_system = build_machine.system()
 host_cpu = host_machine.cpu_family()
 
 cc = meson.get_compiler('c')
+have_cpp = add_languages('cpp', required: false, native: false)
+if have_cpp
+  cpp = meson.get_compiler('cpp')
+endif
 
 not_found_dep = dependency('', required: false)
 thread_dep = dependency('threads')
@@ -827,14 +831,12 @@ endif
 
 llvmopt = get_option('llvm')
 llvm = not_found_dep
-if add_languages('cpp', required: llvmopt, native: false)
+if have_cpp and not llvmopt.disabled()
   llvm = dependency('llvm', version: '>=14', method: 'config-tool', required: llvmopt)
 
   if llvm.found()
 
     cdata.set('USE_LLVM', 1)
-
-    cpp = meson.get_compiler('cpp')
 
     llvm_binpath = llvm.get_variable(configtool: 'bindir')
 
@@ -844,8 +846,13 @@ if add_languages('cpp', required: llvmopt, native: false)
     # find via PATH, too.
     clang = find_program(llvm_binpath / 'clang', 'clang', required: true)
   endif
-elif llvmopt.auto()
-  message('llvm requires a C++ compiler')
+else
+  msg = 'llvm requires a C++ compiler'
+  if llvmopt.auto()
+    message(msg)
+  elif llvmopt.enabled()
+    error(msg)
+  endif
 endif
 
 
@@ -2061,7 +2068,7 @@ common_functional_flags = [
 ]
 
 cflags += cc.get_supported_arguments(common_functional_flags)
-if llvm.found()
+if have_cpp
   cxxflags += cpp.get_supported_arguments(common_functional_flags)
 endif
 
@@ -2085,7 +2092,7 @@ common_warning_flags = [
 ]
 
 cflags_warn += cc.get_supported_arguments(common_warning_flags)
-if llvm.found()
+if have_cpp
   cxxflags_warn += cpp.get_supported_arguments(common_warning_flags)
 endif
 
@@ -2139,7 +2146,7 @@ foreach w : negative_warning_flags
   if cc.has_argument('-W' + w)
     cflags_warn += '-Wno-' + w
   endif
-  if llvm.found() and cpp.has_argument('-W' + w)
+  if have_cpp and cpp.has_argument('-W' + w)
     cxxflags_warn += '-Wno-' + w
   endif
 endforeach
@@ -2200,7 +2207,7 @@ elif optimization == 's'
 endif
 
 cflags_builtin = cc.get_supported_arguments(common_builtin_flags)
-if llvm.found()
+if have_cpp
   cxxflags_builtin = cpp.get_supported_arguments(common_builtin_flags)
 endif
 
@@ -3929,7 +3936,7 @@ summary(
   section: 'Compiler Flags',
 )
 
-if llvm.found()
+if have_cpp
   summary(
     {
       'C++ compiler': '@0@ @1@'.format(cpp.get_id(), cpp.version()),
