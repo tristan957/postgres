@@ -31,6 +31,7 @@ OBJS = \
 	sampling.o \
 	superuser.o \
 	timeout.o \
+	txn_profile_hook.o \
 	tzparser.o
 
 # This location might depend on the installation directories. Therefore

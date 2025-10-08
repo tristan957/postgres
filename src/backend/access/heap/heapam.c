@@ -72,6 +72,7 @@
 #include "utils/snapmgr.h"
 #include "utils/spccache.h"
 #include "utils/syscache.h"
+#include "utils/txn_profile.h"
 
 
 static HeapTuple heap_prepare_insert(Relation relation, HeapTuple tup,
@@ -2889,8 +2890,37 @@ l1:
 			LockBuffer(buffer, BUFFER_LOCK_UNLOCK);
 			heap_acquire_tuplock(relation, &(tp.t_self), LockTupleExclusive,
 								 LockWaitBlock, &have_tuple_lock);
+
+			/* PROFILE: Starting to wait for transaction */
+			if (txn_profile_is_enabled())
+				txn_profile_emit_event(TXNPROF_LOCK_WAIT_START,
+									   GetCurrentTransactionIdIfAny(),
+									   0,
+									   RelationGetRelid(relation),
+									   &(tp.t_self),
+									   LockTupleExclusive);
+
 			XactLockTableWait(xwait, relation, &(tp.t_self), XLTW_Delete);
+
+			/* PROFILE: Wait completed */
+			if (txn_profile_is_enabled())
+				txn_profile_emit_event(TXNPROF_LOCK_WAIT_END,
+									   GetCurrentTransactionIdIfAny(),
+									   0,
+									   RelationGetRelid(relation),
+									   &(tp.t_self),
+									   LockTupleExclusive);
+
 			LockBuffer(buffer, BUFFER_LOCK_EXCLUSIVE);
+
+			/* PROFILE: Now emit lock acquired after wait completes */
+			if (txn_profile_is_enabled())
+				txn_profile_emit_event(TXNPROF_LOCK_ACQUIRED,
+									   GetCurrentTransactionIdIfAny(),
+									   0,
+									   RelationGetRelid(relation),
+									   &(tp.t_self),
+									   LockTupleExclusive);
 
 			/*
 			 * xwait is done, but if xwait had just locked the tuple then some
@@ -2953,10 +2983,37 @@ l1:
 			tmfd->cmax = InvalidCommandId;
 		UnlockReleaseBuffer(buffer);
 		if (have_tuple_lock)
+		{
+			/*
+			 * PROFILE: Don't emit LockReleased here - row locks are held until
+			 * transaction end, not just until the UPDATE/DELETE completes.
+			 * The lock will be implicitly released at commit/abort.
+			 */
 			UnlockTupleTuplock(relation, &(tp.t_self), LockTupleExclusive);
+		}
 		if (vmbuffer != InvalidBuffer)
 			ReleaseBuffer(vmbuffer);
 		return result;
+	}
+
+	/*
+	 * PROFILE: For non-contended deletes (result == TM_Ok), emit lock events.
+	 */
+	if (!have_tuple_lock && txn_profile_is_enabled())
+	{
+		/* Emit lock attempt and immediate acquisition (no contention) */
+		txn_profile_emit_event(TXNPROF_LOCK_ATTEMPT,
+							   GetCurrentTransactionIdIfAny(),
+							   0,
+							   RelationGetRelid(relation),
+							   &(tp.t_self),
+							   LockTupleExclusive);
+		txn_profile_emit_event(TXNPROF_LOCK_ACQUIRED,
+							   GetCurrentTransactionIdIfAny(),
+							   0,
+							   RelationGetRelid(relation),
+							   &(tp.t_self),
+							   LockTupleExclusive);
 	}
 
 	/*
@@ -3132,7 +3189,13 @@ l1:
 	 * Release the lmgr tuple lock, if we had it.
 	 */
 	if (have_tuple_lock)
+	{
+			/* PROFILE: Row locks held until transaction end, not emitted here */
 		UnlockTupleTuplock(relation, &(tp.t_self), LockTupleExclusive);
+	}
+	/*
+	 * PROFILE: Row locks held until transaction end, not emitted here.
+	 */
 
 	pgstat_count_heap_delete(relation);
 
@@ -3585,10 +3648,39 @@ l2:
 			LockBuffer(buffer, BUFFER_LOCK_UNLOCK);
 			heap_acquire_tuplock(relation, &(oldtup.t_self), *lockmode,
 								 LockWaitBlock, &have_tuple_lock);
+
+			/* PROFILE: Starting to wait for transaction */
+			if (txn_profile_is_enabled())
+				txn_profile_emit_event(TXNPROF_LOCK_WAIT_START,
+									   GetCurrentTransactionIdIfAny(),
+									   0,
+									   RelationGetRelid(relation),
+									   &(oldtup.t_self),
+									   *lockmode);
+
 			XactLockTableWait(xwait, relation, &oldtup.t_self,
 							  XLTW_Update);
+
+			/* PROFILE: Wait completed */
+			if (txn_profile_is_enabled())
+				txn_profile_emit_event(TXNPROF_LOCK_WAIT_END,
+									   GetCurrentTransactionIdIfAny(),
+									   0,
+									   RelationGetRelid(relation),
+									   &(oldtup.t_self),
+									   *lockmode);
+
 			checked_lockers = true;
 			LockBuffer(buffer, BUFFER_LOCK_EXCLUSIVE);
+
+			/* PROFILE: Now emit lock acquired after wait completes */
+			if (txn_profile_is_enabled())
+				txn_profile_emit_event(TXNPROF_LOCK_ACQUIRED,
+									   GetCurrentTransactionIdIfAny(),
+									   0,
+									   RelationGetRelid(relation),
+									   &(oldtup.t_self),
+									   *lockmode);
 
 			/*
 			 * xwait is done, but if xwait had just locked the tuple then some
@@ -3643,7 +3735,10 @@ l2:
 			tmfd->cmax = InvalidCommandId;
 		UnlockReleaseBuffer(buffer);
 		if (have_tuple_lock)
+		{
+			/* PROFILE: Row locks held until transaction end, not emitted here */
 			UnlockTupleTuplock(relation, &(oldtup.t_self), *lockmode);
+		}
 		if (vmbuffer != InvalidBuffer)
 			ReleaseBuffer(vmbuffer);
 		*update_indexes = TU_None;
@@ -3655,6 +3750,28 @@ l2:
 		bms_free(modified_attrs);
 		bms_free(interesting_attrs);
 		return result;
+	}
+
+	/*
+	 * PROFILE: For non-contended updates (result == TM_Ok), emit lock events.
+	 * We don't acquire a heavyweight tuple lock in this path, but we do have
+	 * exclusive buffer lock and are about to modify the tuple.
+	 */
+	if (!have_tuple_lock && txn_profile_is_enabled())
+	{
+		/* Emit lock attempt and immediate acquisition (no contention) */
+		txn_profile_emit_event(TXNPROF_LOCK_ATTEMPT,
+							   GetCurrentTransactionIdIfAny(),
+							   0,
+							   RelationGetRelid(relation),
+							   &(oldtup.t_self),
+							   *lockmode);
+		txn_profile_emit_event(TXNPROF_LOCK_ACQUIRED,
+							   GetCurrentTransactionIdIfAny(),
+							   0,
+							   RelationGetRelid(relation),
+							   &(oldtup.t_self),
+							   *lockmode);
 	}
 
 	/*
@@ -4130,7 +4247,13 @@ l2:
 	 * Release the lmgr tuple lock, if we had it.
 	 */
 	if (have_tuple_lock)
+	{
+			/* PROFILE: Row locks held until transaction end, not emitted here */
 		UnlockTupleTuplock(relation, &(oldtup.t_self), *lockmode);
+	}
+	/*
+	 * PROFILE: Row locks held until transaction end, not emitted here.
+	 */
 
 	pgstat_count_heap_update(relation, use_hot_update, newbuf != buffer);
 
@@ -5210,7 +5333,10 @@ out_unlocked:
 	 * release the lmgr tuple lock, if we had it.
 	 */
 	if (have_tuple_lock)
+	{
+			/* PROFILE: Row locks held until transaction end, not emitted here */
 		UnlockTupleTuplock(relation, tid, mode);
+	}
 
 	return result;
 }
@@ -5234,6 +5360,15 @@ heap_acquire_tuplock(Relation relation, ItemPointer tid, LockTupleMode mode,
 	if (*have_tuple_lock)
 		return true;
 
+	/* PROFILE: Emit lock attempt event */
+	if (txn_profile_is_enabled())
+		txn_profile_emit_event(TXNPROF_LOCK_ATTEMPT,
+							   GetCurrentTransactionIdIfAny(),
+							   0,  /* query_id - will add later */
+							   RelationGetRelid(relation),
+							   tid,
+							   mode);
+
 	switch (wait_policy)
 	{
 		case LockWaitBlock:
@@ -5242,7 +5377,17 @@ heap_acquire_tuplock(Relation relation, ItemPointer tid, LockTupleMode mode,
 
 		case LockWaitSkip:
 			if (!ConditionalLockTupleTuplock(relation, tid, mode))
+			{
+				/* PROFILE: Failed to acquire lock */
+				if (txn_profile_is_enabled())
+					txn_profile_emit_event(TXNPROF_LOCK_TIMEOUT,
+										   GetCurrentTransactionIdIfAny(),
+										   0,
+										   RelationGetRelid(relation),
+										   tid,
+										   mode);
 				return false;
+			}
 			break;
 
 		case LockWaitError:
@@ -5253,6 +5398,13 @@ heap_acquire_tuplock(Relation relation, ItemPointer tid, LockTupleMode mode,
 								RelationGetRelationName(relation))));
 			break;
 	}
+
+	/*
+	 * PROFILE: Don't emit LockAcquired here - the tuple lock doesn't mean
+	 * we can proceed yet. We may still need to wait for the transaction that
+	 * owns the tuple. The caller will emit LockAcquired after any waits complete.
+	 */
+
 	*have_tuple_lock = true;
 
 	return true;

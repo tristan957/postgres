@@ -1,0 +1,5 @@
+# txn_profiler extension
+comment = 'Transaction profiling for Perfetto tracing'
+default_version = '1.0'
+module_pathname = '$libdir/txn_profiler'
+relocatable = true
