@@ -24,6 +24,8 @@
 #include "storage/ipc.h"
 #include "storage/procnumber.h"
 #include "utils/guc.h"
+#include "utils/memutils.h"
+#include "utils/palloc.h"
 #include "utils/txn_profile.h"
 
 /* Import hook variable from backend */
@@ -97,16 +99,7 @@ txn_profile_init(void)
 	max_events = (txn_profile_buffer_size * 1024) / sizeof(TxnProfileEvent);
 
 	/* Allocate buffer */
-	event_buffer = (TxnProfileEvent *) malloc(max_events * sizeof(TxnProfileEvent));
-	if (!event_buffer)
-	{
-		ereport(WARNING,
-				(errmsg("failed to allocate transaction profile buffer")));
-		txn_profile_enabled = false;
-		return;
-	}
-
-	memset(event_buffer, 0, max_events * sizeof(TxnProfileEvent));
+	event_buffer = MemoryContextAllocZero(TopMemoryContext, max_events * sizeof(TxnProfileEvent));
 	current_event = 0;
 	buffer_initialized = true;
 	clock_gettime(CLOCK_MONOTONIC, &start_time);
@@ -139,7 +132,7 @@ txn_profile_shutdown(int code, Datum arg)
 
 	if (event_buffer)
 	{
-		free(event_buffer);
+		pfree(event_buffer);
 		event_buffer = NULL;
 	}
 
