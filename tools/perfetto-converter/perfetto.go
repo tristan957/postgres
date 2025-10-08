@@ -8,17 +8,17 @@ import (
 
 // Perfetto JSON trace format structures
 type TraceEvent struct {
-	Name  string                 `json:"name,omitempty"`
-	Cat   string                 `json:"cat,omitempty"`
-	Ph    string                 `json:"ph"` // Event phase: B, E, X, s, f, etc.
-	Ts    float64                `json:"ts"` // Timestamp in microseconds
-	Pid   uint32                 `json:"pid"`
-	Tid   uint32                 `json:"tid"`
-	Dur   float64                `json:"dur,omitempty"` // Duration in microseconds
-	Args  map[string]interface{} `json:"args,omitempty"`
-	Id    string                 `json:"id,omitempty"` // For flow events
-	Bp    string                 `json:"bp,omitempty"` // Binding point for flows
-	Scope string                 `json:"scope,omitempty"`
+	Name  string         `json:"name,omitempty"`
+	Cat   string         `json:"cat,omitempty"`
+	Ph    string         `json:"ph"` // Event phase: B, E, X, s, f, etc.
+	Ts    float64        `json:"ts"` // Timestamp in microseconds
+	Pid   uint32         `json:"pid"`
+	Tid   uint32         `json:"tid"`
+	Dur   float64        `json:"dur,omitempty"` // Duration in microseconds
+	Args  map[string]any `json:"args,omitempty"`
+	Id    string         `json:"id,omitempty"` // For flow events
+	Bp    string         `json:"bp,omitempty"` // Binding point for flows
+	Scope string         `json:"scope,omitempty"`
 }
 
 type Trace struct {
@@ -111,9 +111,9 @@ func processBackendEvents(pf *ProfileFile, trace *Trace, lockTimeline *LockTimel
 	baseTid := pf.Header.BackendID
 
 	// Use different track IDs for different event types to avoid nesting issues
-	txnTid := baseTid * 10 + 0    // Transaction track
-	queryTid := baseTid * 10 + 1  // Query track
-	lockTid := baseTid * 10 + 2   // Lock track
+	txnTid := baseTid*10 + 0   // Transaction track
+	queryTid := baseTid*10 + 1 // Query track
+	lockTid := baseTid*10 + 2  // Lock track
 
 	// Debug: Show event sequence for all backends with lock events
 	hasLockEvents := false

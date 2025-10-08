@@ -1,25 +1,37 @@
 #!/bin/bash
 set -e
 
-PATH=/workspaces/hackathon/pg_install/v17/bin:$PATH
+#PATH=/workspaces/hackathon/pg_install/v17/bin:$PATH
+#PGDATA_DIR=/tmp/pgdata_deadlock
+#VENDOR_DIR=/workspaces/hackathon/vendor
+
+PATH=/Users/elena.grahovac/workdir/postgres/pg/bin:$PATH
+PGDATA_DIR=/Users/elena.grahovac/pgdata
+VENDOR_DIR=/Users/elena.grahovac/workdir/postgres
 
 echo "=== Setting up test database ==="
-rm -rf /tmp/pgdata_deadlock
-initdb -D /tmp/pgdata_deadlock > /dev/null
+rm -rf $PGDATA_DIR
+initdb -D $PGDATA_DIR > /dev/null
 
-cat >> /tmp/pgdata_deadlock/postgresql.conf << 'EOF'
-shared_preload_libraries = 'txn_profiler'
+cat >> $PGDATA_DIR/postgresql.conf << 'EOF'
+shared_preload_libraries = 'txn_profiler,pg_tracing'
 txn_profile.enabled = on
 txn_profile.buffer_size = 128
 lock_timeout = 0
 compute_query_id = on
+pg_tracing.max_span = 10000
+pg_tracing.track = all
+pg_tracing.sample_rate = 1.0
 EOF
 
-pg_ctl -D /tmp/pgdata_deadlock -l /tmp/pg_deadlock.log start
+pg_ctl -D $PGDATA_DIR -l /tmp/pg_deadlock.log start
 sleep 2
 
 echo "=== Creating schema ==="
 psql -h /tmp -d postgres -c "CREATE EXTENSION txn_profiler;"
+psql -h /tmp -d postgres -c "CREATE EXTENSION pg_tracing;"
+sleep 1
+
 psql -h /tmp -d postgres -c "CREATE TABLE t (key TEXT PRIMARY KEY, value INT);"
 psql -h /tmp -d postgres -c "INSERT INTO t VALUES ('x', 1), ('y', 2);"
 
@@ -55,9 +67,8 @@ wait $PID_B || echo "Transaction B status: $?"
 
 sleep 1
 
-echo "=== Stopping PostgreSQL ==="
-pg_ctl -D /tmp/pgdata_deadlock stop
-sleep 1
+echo "=== Counting spans collected by pg_tracing ==="
+psql -h /tmp -d postgres -c "select count(*) from pg_tracing_peek_spans limit 1;"
 
 echo ""
 echo "=== Transaction A log ==="
@@ -69,21 +80,25 @@ cat /tmp/txn_b.log
 
 echo ""
 echo "=== Profile files generated ==="
-ls -lh /tmp/pgdata_deadlock/txn_profiles/
+ls -lh $PGDATA_DIR/txn_profiles/
 
 echo ""
 echo "=== Converting to Perfetto ==="
-/workspaces/hackathon/vendor/postgres-v17/tools/perfetto-converter/perfetto-converter \
-  -input /tmp/pgdata_deadlock/txn_profiles \
-  -output /tmp/deadlock_trace.json
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+OUTPUT_FILE=~/tmp/deadlock_trace_${TIMESTAMP}.json
+$VENDOR_DIR/tools/perfetto-converter/perfetto-converter \
+  -input $PGDATA_DIR/txn_profiles \
+  -output $OUTPUT_FILE
 
 echo ""
 echo "=== Analyzing trace events ==="
-python3 << 'PYTHON'
+python3 << PYTHON
 import json
 import sys
+import os
 
-with open('/tmp/deadlock_trace.json', 'r') as f:
+trace_file = os.path.expanduser('$OUTPUT_FILE')
+with open(trace_file, 'r') as f:
     trace = json.load(f)
 
 # Group events by PID
@@ -150,6 +165,10 @@ print("   - Other should succeed after lock is released")
 print("3. CTIDs should show (0,1) for key='x' and (0,2) for key='y'")
 PYTHON
 
+echo "=== Stopping PostgreSQL ==="
+pg_ctl -D $PGDATA_DIR stop
+sleep 3
+
 echo ""
-echo "Trace file: /tmp/deadlock_trace.json"
+echo "Trace file: $OUTPUT_FILE"
 echo "View at: chrome://tracing or https://ui.perfetto.dev/"

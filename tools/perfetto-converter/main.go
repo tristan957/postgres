@@ -1,18 +1,25 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/jackc/pgx/v5"
 )
 
 func main() {
+	connStr := flag.String("db", "postgres://localhost/postgres?host=/tmp", "PostgreSQL connection string")
 	inputDir := flag.String("input", "", "Input directory containing *.bin files")
 	inputFiles := flag.String("files", "", "Comma-separated list of input files")
 	output := flag.String("output", "trace.json", "Output Perfetto trace file")
 	flag.Parse()
+
+	ctx := context.Background()
 
 	var files []string
 
@@ -61,11 +68,33 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Connect to PostgreSQL
+	log.Printf("Connecting to PostgreSQL...")
+	conn, err := pgx.Connect(ctx, *connStr)
+	if err != nil {
+		log.Fatalf("Failed to connect to database: %v", err)
+	}
+	defer conn.Close(ctx)
+
+	// Collect pg_tracing spans
+	filters := FilterOptions{}
+	log.Printf("Querying pg_tracing spans...")
+	spans, err := queryPgTracingSpans(ctx, conn, filters)
+	if err != nil {
+		log.Panicf("Failed to query spans: %v", err)
+	}
+
+	log.Printf("Total spans queried: %d", len(spans))
+
+	if err := GeneratePerfettoTraceFromSpans(spans, *output); err != nil {
+		log.Panicf("Failed to generate trace: %v", err)
+	}
+
 	// Generate Perfetto trace
-	if err := GeneratePerfettoTrace(profileFiles, *output); err != nil {
+	/*if err := GeneratePerfettoTrace(profileFiles, *output); err != nil {
 		fmt.Fprintf(os.Stderr, "Error generating trace: %v\n", err)
 		os.Exit(1)
-	}
+	}*/
 
 	fmt.Printf("Trace written to %s\n", *output)
 	fmt.Printf("\nView in Chrome: chrome://tracing\n")
