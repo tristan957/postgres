@@ -12,12 +12,12 @@
  */
 #include "postgres.h"
 
-#include <time.h>
 #include <unistd.h>
 #include <sys/stat.h>
 
 #include "access/transam.h"
 #include "access/xact.h"
+#include "datatype/timestamp.h"
 #include "miscadmin.h"
 #include "port/atomics.h"
 #include "portability/instr_time.h"
@@ -28,6 +28,7 @@
 #include "utils/guc.h"
 #include "utils/memutils.h"
 #include "utils/palloc.h"
+#include "utils/timestamp.h"
 #include "utils/txn_profile.h"
 
 /* Import hook variable from backend */
@@ -60,10 +61,8 @@ static int	max_events = 0;
 static int	current_event = 0;
 static bool buffer_initialized = false;
 static bool shutdown_registered = false;
-static struct timespec start_time;
 
 /* Function declarations */
-static uint64 get_timestamp_ns(void);
 static void txn_profile_write_header(FILE *fp);
 static bool txn_profile_is_enabled_internal(void);
 static void txn_profile_emit_event_internal(TxnProfileEventType type,
@@ -75,18 +74,6 @@ static void txn_profile_emit_event_internal(TxnProfileEventType type,
 static void txn_profile_flush_to_file(void);
 void txn_profile_init(void);
 void txn_profile_shutdown(int code, Datum arg);
-
-/*
- * Get current timestamp in nanoseconds
- */
-static uint64
-get_timestamp_ns(void)
-{
-	struct timespec ts;
-
-	clock_gettime(CLOCK_MONOTONIC, &ts);
-	return ((uint64) ts.tv_sec * 1000000000ULL) + ts.tv_nsec;
-}
 
 /*
  * Initialize profiling system
@@ -104,7 +91,6 @@ txn_profile_init(void)
 	event_buffer = MemoryContextAllocZero(TopMemoryContext, max_events * sizeof(TxnProfileEvent));
 	current_event = 0;
 	buffer_initialized = true;
-	clock_gettime(CLOCK_MONOTONIC, &start_time);
 
 	/* Register shutdown callback for THIS backend */
 	if (!shutdown_registered)
@@ -189,7 +175,7 @@ txn_profile_emit_event_internal(TxnProfileEventType type,
 	event = &event_buffer[current_event++];
 
 	/* Fill in event data */
-	event->timestamp_ns = get_timestamp_ns();
+	event->timestamp_ns = GetCurrentTimestamp();
 	event->backend_id = (uint32) MyProcNumber;
 	event->pid = MyProcPid;
 	event->xid = xid;
@@ -228,6 +214,7 @@ txn_profile_write_header(FILE *fp)
 {
 	uint32		version = 1;
 	uint32		pg_version = PG_VERSION_NUM;
+	uint64		timestamp = (uint64) GetCurrentTimestamp();
 
 	uint32 backend_id = (uint32) MyProcNumber;
 
@@ -235,8 +222,7 @@ txn_profile_write_header(FILE *fp)
 	fwrite(&pg_version, sizeof(uint32), 1, fp);
 	fwrite(&backend_id, sizeof(uint32), 1, fp);
 	fwrite(&MyProcPid, sizeof(uint32), 1, fp);
-	fwrite(&start_time.tv_sec, sizeof(time_t), 1, fp);
-	fwrite(&start_time.tv_nsec, sizeof(long), 1, fp);
+	fwrite(&timestamp, sizeof(uint64), 1, fp);
 	fwrite(&current_event, sizeof(int), 1, fp);
 }
 
