@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"time"
 )
 
 // EventType matches TxnProfileEventType from C
@@ -40,13 +39,12 @@ func (e EventType) String() string {
 
 // Header matches the file header written in C
 type Header struct {
-	Version      uint32
-	PGVersion    uint32
-	BackendID    uint32
-	PID          uint32
-	StartTimeSec int64
-	StartTimeNs  int64
-	EventCount   int32
+	Version    uint32
+	PGVersion  uint32
+	BackendID  uint32
+	PID        uint32
+	Padding    uint64 // Reserved (was start_time)
+	EventCount int32
 }
 
 // Event matches TxnProfileEvent from C (56 bytes with C struct packing)
@@ -102,8 +100,4 @@ func ParseProfileFile(filename string) (*ProfileFile, error) {
 	}
 
 	return pf, nil
-}
-
-func (pf *ProfileFile) GetStartTime() time.Time {
-	return time.Unix(pf.Header.StartTimeSec, pf.Header.StartTimeNs)
 }

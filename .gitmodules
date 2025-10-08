@@ -1,0 +1,3 @@
+[submodule "vendor/pg_tracing"]
+	path = vendor/pg_tracing
+	url = https://github.com/DataDog/pg_tracing

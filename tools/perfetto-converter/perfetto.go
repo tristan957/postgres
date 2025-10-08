@@ -76,7 +76,51 @@ func buildLockTimeline(files []*ProfileFile) *LockTimeline {
 	return timeline
 }
 
-func GeneratePerfettoTrace(files []*ProfileFile, outputPath string) error {
+// findContendingHold finds the hold event that overlaps with a wait event
+// Returns the holder's PID and the timestamp when the hold started
+func findContendingHold(lockKey string, waitStart uint64, waitPID uint32, timeline *LockTimeline) (holderPID uint32, holdStartTs uint64, found bool) {
+	events := timeline.Events[lockKey]
+	if len(events) == 0 {
+		return 0, 0, false
+	}
+
+	// Find the most recent LockAcquired before or at waitStart from a different backend
+	var holdStart *LockEvent
+	for i := len(events) - 1; i >= 0; i-- {
+		evt := &events[i]
+		if evt.EventType == LockAcquired && evt.Timestamp <= waitStart && evt.PID != waitPID {
+			holdStart = evt
+			break
+		}
+	}
+
+	if holdStart == nil {
+		return 0, 0, false
+	}
+
+	// Verify this hold was still active when wait started
+	// Find the next LockReleased event from the same PID
+	holdActive := true
+	for i := 0; i < len(events); i++ {
+		evt := &events[i]
+		if evt.EventType == LockReleased && evt.PID == holdStart.PID && evt.Timestamp > holdStart.Timestamp {
+			// If released before wait started, no contention
+			if evt.Timestamp < waitStart {
+				holdActive = false
+			}
+			break
+		}
+	}
+
+	if !holdActive {
+		return 0, 0, false
+	}
+
+	return holdStart.PID, holdStart.Timestamp, true
+}
+
+// GenerateLockEvents generates trace events from binary profile files without writing to disk
+func GenerateLockEvents(files []*ProfileFile) ([]TraceEvent, error) {
 	trace := &Trace{
 		TraceEvents: make([]TraceEvent, 0, 10000),
 	}
@@ -84,10 +128,27 @@ func GeneratePerfettoTrace(files []*ProfileFile, outputPath string) error {
 	// Build global lock timeline for flow events
 	lockTimeline := buildLockTimeline(files)
 
+	// Build PID to BackendID mapping for flow events
+	pidToBackendID := make(map[uint32]uint32)
+	for _, pf := range files {
+		pidToBackendID[pf.Header.PID] = pf.Header.BackendID
+	}
+
 	// Process each file (each backend)
 	for _, pf := range files {
-		processBackendEvents(pf, trace, lockTimeline)
+		processBackendEvents(pf, trace, lockTimeline, pidToBackendID)
 	}
+
+	return trace.TraceEvents, nil
+}
+
+func GeneratePerfettoTrace(files []*ProfileFile, outputPath string) error {
+	events, err := GenerateLockEvents(files)
+	if err != nil {
+		return err
+	}
+
+	trace := &Trace{TraceEvents: events}
 
 	// Write JSON
 	f, err := os.Create(outputPath)
@@ -106,7 +167,7 @@ func GeneratePerfettoTrace(files []*ProfileFile, outputPath string) error {
 	return nil
 }
 
-func processBackendEvents(pf *ProfileFile, trace *Trace, lockTimeline *LockTimeline) {
+func processBackendEvents(pf *ProfileFile, trace *Trace, lockTimeline *LockTimeline, pidToBackendID map[uint32]uint32) {
 	pid := pf.Header.PID
 	baseTid := pf.Header.BackendID
 
@@ -154,6 +215,8 @@ func processBackendEvents(pf *ProfileFile, trace *Trace, lockTimeline *LockTimel
 	txnStarts := make(map[uint32]*PendingEvent) // key: xid
 	// Track which locks each transaction holds (for closing at commit/abort)
 	txnLocks := make(map[uint32][]string) // key: xid, value: list of lock keys
+	// Track which queries each transaction has (for closing at commit/abort)
+	txnQueries := make(map[uint32][]uint64) // key: xid, value: list of query_ids
 	// For query tracking
 	queryStarts := make(map[uint64]*PendingEvent) // key: query_id
 
@@ -238,6 +301,17 @@ func processBackendEvents(pf *ProfileFile, trace *Trace, lockTimeline *LockTimel
 				break
 			}
 
+			// Close all pending queries for this transaction
+			if queries, exists := txnQueries[evt.Xid]; exists {
+				for _, queryID := range queries {
+					if pending, queryExists := queryStarts[queryID]; queryExists {
+						emitEnd(pending.Category, getTid(pending.Category))
+						delete(queryStarts, queryID)
+					}
+				}
+				delete(txnQueries, evt.Xid)
+			}
+
 			// Close all locks held by this transaction
 			if locks, exists := txnLocks[evt.Xid]; exists {
 				for _, lockKey := range locks {
@@ -284,6 +358,17 @@ func processBackendEvents(pf *ProfileFile, trace *Trace, lockTimeline *LockTimel
 			// Skip xid=0 (InvalidTransactionId) - these are read-only implicit transactions
 			if evt.Xid == 0 {
 				break
+			}
+
+			// Close all pending queries for this transaction
+			if queries, exists := txnQueries[evt.Xid]; exists {
+				for _, queryID := range queries {
+					if pending, queryExists := queryStarts[queryID]; queryExists {
+						emitEnd(pending.Category, getTid(pending.Category))
+						delete(queryStarts, queryID)
+					}
+				}
+				delete(txnQueries, evt.Xid)
 			}
 
 			// Close all locks held by this transaction (including any we're waiting on)
@@ -341,11 +426,22 @@ func processBackendEvents(pf *ProfileFile, trace *Trace, lockTimeline *LockTimel
 				},
 			})
 			queryStarts[evt.QueryID] = &PendingEvent{Event: evt, StartTs: ts, Category: "query"}
+			// Track this query for this transaction
+			txnQueries[evt.Xid] = append(txnQueries[evt.Xid], evt.QueryID)
 
 		case QueryEnd:
 			if pending, exists := queryStarts[evt.QueryID]; exists {
 				emitEnd(pending.Category, getTid(pending.Category))
 				delete(queryStarts, evt.QueryID)
+				// Remove from transaction's query list
+				if queries, txnExists := txnQueries[pending.Event.Xid]; txnExists {
+					for i, qid := range queries {
+						if qid == evt.QueryID {
+							txnQueries[pending.Event.Xid] = append(queries[:i], queries[i+1:]...)
+							break
+						}
+					}
+				}
 			}
 
 		case LockAttempt:
@@ -422,6 +518,42 @@ func processBackendEvents(pf *ProfileFile, trace *Trace, lockTimeline *LockTimel
 				Event:    evt,
 				StartTs:  ts,
 				Category: "lock_wait",
+			}
+
+			// Generate flow event to show contention (arrow from holder to waiter)
+			if holderPID, holdStartTs, found := findContendingHold(lockKey, evt.TimestampNs, pid, lockTimeline); found {
+				// Calculate holder's lock track ID
+				holderBackendID := pidToBackendID[holderPID]
+				holderLockTid := holderBackendID*10 + 2
+
+				// Create unique flow ID for this contention
+				flowID := fmt.Sprintf("contention_%s_%d", lockKey, evt.TimestampNs)
+
+				// Flow start at the beginning of the hold slice
+				trace.TraceEvents = append(trace.TraceEvents, TraceEvent{
+					Name:  "lock_contention",
+					Cat:   "flow",
+					Ph:    "s",
+					Ts:    float64(holdStartTs) / 1000.0, // Convert ns to µs
+					Pid:   holderPID,
+					Tid:   holderLockTid,
+					Id:    flowID,
+					Bp:    "e",
+					Scope: "t",
+				})
+
+				// Flow end at the start of the wait slice
+				trace.TraceEvents = append(trace.TraceEvents, TraceEvent{
+					Name:  "lock_contention",
+					Cat:   "flow",
+					Ph:    "f",
+					Ts:    ts,
+					Pid:   pid,
+					Tid:   lockTid,
+					Id:    flowID,
+					Bp:    "e",
+					Scope: "t",
+				})
 			}
 
 		case LockWaitEnd:

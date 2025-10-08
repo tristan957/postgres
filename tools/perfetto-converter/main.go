@@ -68,6 +68,14 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Generate lock events from binary profile files
+	log.Printf("Generating lock events from binary files...")
+	lockEvents, err := GenerateLockEvents(profileFiles)
+	if err != nil {
+		log.Fatalf("Failed to generate lock events: %v", err)
+	}
+	log.Printf("Generated %d lock events", len(lockEvents))
+
 	// Connect to PostgreSQL
 	log.Printf("Connecting to PostgreSQL...")
 	conn, err := pgx.Connect(ctx, *connStr)
@@ -83,18 +91,20 @@ func main() {
 	if err != nil {
 		log.Panicf("Failed to query spans: %v", err)
 	}
-
 	log.Printf("Total spans queried: %d", len(spans))
 
-	if err := GeneratePerfettoTraceFromSpans(spans, *output); err != nil {
-		log.Panicf("Failed to generate trace: %v", err)
-	}
+	// Convert pg_tracing spans to trace events
+	spanEvents := ConvertSpansToEvents(spans)
+	log.Printf("Generated %d span events", len(spanEvents))
 
-	// Generate Perfetto trace
-	/*if err := GeneratePerfettoTrace(profileFiles, *output); err != nil {
-		fmt.Fprintf(os.Stderr, "Error generating trace: %v\n", err)
-		os.Exit(1)
-	}*/
+	// Merge lock events and span events
+	allEvents := append(lockEvents, spanEvents...)
+	log.Printf("Total combined events: %d", len(allEvents))
+
+	// Write combined trace to file
+	if err := WritePerfettoTrace(allEvents, *output); err != nil {
+		log.Panicf("Failed to write trace: %v", err)
+	}
 
 	fmt.Printf("Trace written to %s\n", *output)
 	fmt.Printf("\nView in Chrome: chrome://tracing\n")

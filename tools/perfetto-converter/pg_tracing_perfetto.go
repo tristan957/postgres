@@ -41,12 +41,18 @@ func spanToTraceEvent(span PgTracingSpan) TraceEvent {
 	}
 }
 
-func GeneratePerfettoTraceFromSpans(spans []PgTracingSpan, outputPath string) error {
+// ConvertSpansToEvents converts pg_tracing spans to TraceEvents without writing to disk
+func ConvertSpansToEvents(spans []PgTracingSpan) []TraceEvent {
 	var traceEvents []TraceEvent
 	for _, span := range spans {
 		traceEvents = append(traceEvents, spanToTraceEvent(span))
 	}
-	trace := TraceFile{TraceEvents: traceEvents, TraceName: "pgtrace"}
+	return traceEvents
+}
+
+// WritePerfettoTrace writes a slice of TraceEvents to a Perfetto JSON file
+func WritePerfettoTrace(events []TraceEvent, outputPath string) error {
+	trace := TraceFile{TraceEvents: events, TraceName: "pgtrace"}
 	file, err := os.Create(outputPath)
 	if err != nil {
 		return err
@@ -55,4 +61,9 @@ func GeneratePerfettoTraceFromSpans(spans []PgTracingSpan, outputPath string) er
 	encoder := json.NewEncoder(file)
 	encoder.SetIndent("", "  ")
 	return encoder.Encode(trace)
+}
+
+func GeneratePerfettoTraceFromSpans(spans []PgTracingSpan, outputPath string) error {
+	events := ConvertSpansToEvents(spans)
+	return WritePerfettoTrace(events, outputPath)
 }
