@@ -16,6 +16,7 @@ backend_sources += files(
   'sampling.c',
   'superuser.c',
   'timeout.c',
+  'txn_profile_hook.c',
   'tzparser.c',
 )
 
