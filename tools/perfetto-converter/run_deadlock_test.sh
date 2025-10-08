@@ -82,10 +82,27 @@ wait $PID_B || true
 echo "   Transaction A (PID $PID_A): $(grep -E 'COMMIT|ROLLBACK' /tmp/test_txn_a_output.txt | tail -1)"
 echo "   Transaction B (PID $PID_B): $(grep -E 'COMMIT|ROLLBACK' /tmp/test_txn_b_output.txt | tail -1)"
 
-# Query pg_tracing spans and generate trace
-echo "7. Querying pg_tracing spans and generating Perfetto trace..."
+# Query pg_tracing spans and generate trace (JSON format)
+echo "7. Generating Perfetto trace (JSON format)..."
 DB_CONN="host=127.0.0.1 port=$PG_PORT user=$USER dbname=postgres"
 $CONVERTER -input $PROFILE_DIR -db "$DB_CONN" -output $OUTPUT_TRACE
+
+# Generate protobuf trace using Python converter
+echo "7b. Generating Perfetto trace (Protobuf format)..."
+OUTPUT_TRACE_PB="/tmp/deadlock_trace.pftrace"
+PYTHON_CONVERTER="$SCRIPT_DIR/perfetto_converter.py"
+DB_CONN_PY="postgres://127.0.0.1:$PG_PORT/postgres"
+
+# Use uvx to run Python with dependencies
+if command -v uvx &> /dev/null; then
+    ~/.local/bin/uvx --with perfetto --with psycopg2-binary python3 "$PYTHON_CONVERTER" \
+        -input "$PROFILE_DIR" \
+        -db "$DB_CONN_PY" \
+        -output "$OUTPUT_TRACE_PB" 2>&1 | grep -v "^Installed"
+else
+    echo "   Warning: uvx not found, skipping protobuf trace generation"
+    echo "   Install with: curl -LsSf https://astral.sh/uv/install.sh | sh"
+fi
 
 # Stop PostgreSQL
 echo "8. Stopping PostgreSQL..."
@@ -96,7 +113,7 @@ sleep 1
 echo ""
 echo "=== Results ==="
 EVENT_COUNT=$(jq '.traceEvents | length' $OUTPUT_TRACE)
-echo "Trace events: $EVENT_COUNT"
+echo "Trace events (JSON): $EVENT_COUNT"
 echo ""
 
 # Show span summary
@@ -104,10 +121,19 @@ echo "Span summary:"
 jq -r '.traceEvents[] | select(.name) | "  \(.name) (pid=\(.pid))"' $OUTPUT_TRACE | head -20
 
 echo ""
-echo "Trace written to: $OUTPUT_TRACE"
+echo "=== Output Files ==="
+echo "JSON trace (Chrome Tracing format):"
+echo "  File: $OUTPUT_TRACE"
+echo "  Size: $(du -h $OUTPUT_TRACE | cut -f1)"
+echo "  View: chrome://tracing"
 echo ""
-echo "View in:"
-echo "  - Chrome: chrome://tracing"
-echo "  - Perfetto UI: https://ui.perfetto.dev/"
-echo ""
+
+if [ -f "$OUTPUT_TRACE_PB" ]; then
+    echo "Protobuf trace (Perfetto native format):"
+    echo "  File: $OUTPUT_TRACE_PB"
+    echo "  Size: $(du -h $OUTPUT_TRACE_PB | cut -f1)"
+    echo "  View: https://ui.perfetto.dev/"
+    echo ""
+fi
+
 echo "PostgreSQL log: $PG_LOG"
