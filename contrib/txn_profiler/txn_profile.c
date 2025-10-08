@@ -16,6 +16,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
+#include "access/transam.h"
 #include "access/xact.h"
 #include "miscadmin.h"
 #include "port/atomics.h"
@@ -23,6 +24,7 @@
 #include "storage/fd.h"
 #include "storage/ipc.h"
 #include "storage/procnumber.h"
+#include "utils/elog.h"
 #include "utils/guc.h"
 #include "utils/txn_profile.h"
 
@@ -173,6 +175,12 @@ txn_profile_emit_event_internal(TxnProfileEventType type,
 								LockTupleMode lock_mode)
 {
 	TxnProfileEvent *event;
+
+	if (!TransactionIdIsValid(xid))
+	{
+		elog(WARNING, "txn_profile: event emitted with invalid xid type=%d", type);
+		return;
+	}
 
 	if (!txn_profile_is_enabled_internal())
 		return;
