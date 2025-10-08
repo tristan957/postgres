@@ -215,6 +215,10 @@ func processBackendEvents(pf *ProfileFile, trace *Trace, lockTimeline *LockTimel
 
 		switch evt.EventType {
 		case TxnBegin:
+			// Skip xid=0 (InvalidTransactionId) - these are read-only implicit transactions
+			if evt.Xid == 0 {
+				break
+			}
 			trace.TraceEvents = append(trace.TraceEvents, TraceEvent{
 				Name: fmt.Sprintf("Txn %d", evt.Xid),
 				Cat:  "transaction",
@@ -229,9 +233,25 @@ func processBackendEvents(pf *ProfileFile, trace *Trace, lockTimeline *LockTimel
 			txnStarts[evt.Xid] = &PendingEvent{Event: evt, StartTs: ts, Category: "transaction"}
 
 		case TxnCommit:
+			// Skip xid=0 (InvalidTransactionId) - these are read-only implicit transactions
+			if evt.Xid == 0 {
+				break
+			}
+
 			// Close all locks held by this transaction
 			if locks, exists := txnLocks[evt.Xid]; exists {
 				for _, lockKey := range locks {
+					// Close any pending wait
+					if pending, waitExists := waitStarts[lockKey]; waitExists {
+						emitEnd(pending.Category, getTid(pending.Category))
+						delete(waitStarts, lockKey)
+					}
+					// Close any pending lock attempt
+					if pending, attemptExists := lockAttemptStarts[lockKey]; attemptExists {
+						emitEnd(pending.Category, getTid(pending.Category))
+						delete(lockAttemptStarts, lockKey)
+					}
+					// Close any held lock
 					if pending, holdExists := lockHoldStarts[lockKey]; holdExists {
 						// End the hold slice for this lock
 						emitEnd(pending.Category, getTid(pending.Category))
@@ -261,6 +281,11 @@ func processBackendEvents(pf *ProfileFile, trace *Trace, lockTimeline *LockTimel
 			delete(txnStarts, evt.Xid)
 
 		case TxnAbort:
+			// Skip xid=0 (InvalidTransactionId) - these are read-only implicit transactions
+			if evt.Xid == 0 {
+				break
+			}
+
 			// Close all locks held by this transaction (including any we're waiting on)
 			if locks, exists := txnLocks[evt.Xid]; exists {
 				for _, lockKey := range locks {
@@ -333,7 +358,7 @@ func processBackendEvents(pf *ProfileFile, trace *Trace, lockTimeline *LockTimel
 				Ph:  "B", // Begin
 				Ts:  ts,
 				Pid: pid,
-				Tid: tid,
+				Tid: lockTid,
 				Args: map[string]interface{}{
 					"xid":    evt.Xid,
 					"mode":   evt.LockMode,
@@ -365,7 +390,7 @@ func processBackendEvents(pf *ProfileFile, trace *Trace, lockTimeline *LockTimel
 				Ph:  "B",
 				Ts:  ts,
 				Pid: pid,
-				Tid: tid,
+				Tid: lockTid,
 				Args: map[string]interface{}{
 					"xid":  evt.Xid,
 					"mode": evt.LockMode,
@@ -387,7 +412,7 @@ func processBackendEvents(pf *ProfileFile, trace *Trace, lockTimeline *LockTimel
 				Ph:  "B",
 				Ts:  ts,
 				Pid: pid,
-				Tid: tid,
+				Tid: lockTid,
 				Args: map[string]interface{}{
 					"xid":  evt.Xid,
 					"ctid": fmt.Sprintf("(%d,%d)", evt.Blocknum, evt.Offnum),
@@ -423,7 +448,7 @@ func processBackendEvents(pf *ProfileFile, trace *Trace, lockTimeline *LockTimel
 				Ph:  "i", // Instant event
 				Ts:  ts,
 				Pid: pid,
-				Tid: tid,
+				Tid: lockTid,
 				Args: map[string]interface{}{
 					"xid":  evt.Xid,
 					"ctid": fmt.Sprintf("(%d,%d)", evt.Blocknum, evt.Offnum),
