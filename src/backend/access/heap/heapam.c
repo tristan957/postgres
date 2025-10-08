@@ -73,6 +73,7 @@
 #include "utils/spccache.h"
 #include "utils/syscache.h"
 #include "utils/txn_profile.h"
+#include "utils/backend_status.h"
 
 
 static HeapTuple heap_prepare_insert(Relation relation, HeapTuple tup,
@@ -2895,7 +2896,7 @@ l1:
 			if (txn_profile_is_enabled())
 				txn_profile_emit_event(TXNPROF_LOCK_WAIT_START,
 									   GetCurrentTransactionIdIfAny(),
-									   0,
+									   pgstat_get_my_query_id(),
 									   RelationGetRelid(relation),
 									   &(tp.t_self),
 									   LockTupleExclusive);
@@ -2906,7 +2907,7 @@ l1:
 			if (txn_profile_is_enabled())
 				txn_profile_emit_event(TXNPROF_LOCK_WAIT_END,
 									   GetCurrentTransactionIdIfAny(),
-									   0,
+									   pgstat_get_my_query_id(),
 									   RelationGetRelid(relation),
 									   &(tp.t_self),
 									   LockTupleExclusive);
@@ -2917,7 +2918,7 @@ l1:
 			if (txn_profile_is_enabled())
 				txn_profile_emit_event(TXNPROF_LOCK_ACQUIRED,
 									   GetCurrentTransactionIdIfAny(),
-									   0,
+									   pgstat_get_my_query_id(),
 									   RelationGetRelid(relation),
 									   &(tp.t_self),
 									   LockTupleExclusive);
@@ -3004,13 +3005,13 @@ l1:
 		/* Emit lock attempt and immediate acquisition (no contention) */
 		txn_profile_emit_event(TXNPROF_LOCK_ATTEMPT,
 							   GetCurrentTransactionIdIfAny(),
-							   0,
+							   pgstat_get_my_query_id(),
 							   RelationGetRelid(relation),
 							   &(tp.t_self),
 							   LockTupleExclusive);
 		txn_profile_emit_event(TXNPROF_LOCK_ACQUIRED,
 							   GetCurrentTransactionIdIfAny(),
-							   0,
+							   pgstat_get_my_query_id(),
 							   RelationGetRelid(relation),
 							   &(tp.t_self),
 							   LockTupleExclusive);
@@ -3653,7 +3654,7 @@ l2:
 			if (txn_profile_is_enabled())
 				txn_profile_emit_event(TXNPROF_LOCK_WAIT_START,
 									   GetCurrentTransactionIdIfAny(),
-									   0,
+									   pgstat_get_my_query_id(),
 									   RelationGetRelid(relation),
 									   &(oldtup.t_self),
 									   *lockmode);
@@ -3665,7 +3666,7 @@ l2:
 			if (txn_profile_is_enabled())
 				txn_profile_emit_event(TXNPROF_LOCK_WAIT_END,
 									   GetCurrentTransactionIdIfAny(),
-									   0,
+									   pgstat_get_my_query_id(),
 									   RelationGetRelid(relation),
 									   &(oldtup.t_self),
 									   *lockmode);
@@ -3677,7 +3678,7 @@ l2:
 			if (txn_profile_is_enabled())
 				txn_profile_emit_event(TXNPROF_LOCK_ACQUIRED,
 									   GetCurrentTransactionIdIfAny(),
-									   0,
+									   pgstat_get_my_query_id(),
 									   RelationGetRelid(relation),
 									   &(oldtup.t_self),
 									   *lockmode);
@@ -3762,13 +3763,13 @@ l2:
 		/* Emit lock attempt and immediate acquisition (no contention) */
 		txn_profile_emit_event(TXNPROF_LOCK_ATTEMPT,
 							   GetCurrentTransactionIdIfAny(),
-							   0,
+							   pgstat_get_my_query_id(),
 							   RelationGetRelid(relation),
 							   &(oldtup.t_self),
 							   *lockmode);
 		txn_profile_emit_event(TXNPROF_LOCK_ACQUIRED,
 							   GetCurrentTransactionIdIfAny(),
-							   0,
+							   pgstat_get_my_query_id(),
 							   RelationGetRelid(relation),
 							   &(oldtup.t_self),
 							   *lockmode);
@@ -5364,7 +5365,7 @@ heap_acquire_tuplock(Relation relation, ItemPointer tid, LockTupleMode mode,
 	if (txn_profile_is_enabled())
 		txn_profile_emit_event(TXNPROF_LOCK_ATTEMPT,
 							   GetCurrentTransactionIdIfAny(),
-							   0,  /* query_id - will add later */
+							   pgstat_get_my_query_id(),
 							   RelationGetRelid(relation),
 							   tid,
 							   mode);
@@ -5382,7 +5383,7 @@ heap_acquire_tuplock(Relation relation, ItemPointer tid, LockTupleMode mode,
 				if (txn_profile_is_enabled())
 					txn_profile_emit_event(TXNPROF_LOCK_TIMEOUT,
 										   GetCurrentTransactionIdIfAny(),
-										   0,
+										   pgstat_get_my_query_id(),
 										   RelationGetRelid(relation),
 										   tid,
 										   mode);
