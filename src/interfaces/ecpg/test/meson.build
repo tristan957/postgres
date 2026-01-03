@@ -47,7 +47,7 @@ ecpg_preproc_test_command_start = [
   ecpg_exe,
   '--regression',
   '-I@CURRENT_SOURCE_DIR@',
-  '-I@SOURCE_ROOT@' + '/src/interfaces/ecpg/include/',
+  '-I@0@/src/interfaces/ecpg/include/'.format(meson.project_build_root()),
 ]
 ecpg_preproc_test_command_end = [
   '-o', '@OUTPUT@', '@INPUT@'

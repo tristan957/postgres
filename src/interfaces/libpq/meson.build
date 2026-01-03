@@ -85,6 +85,8 @@ libpq = declare_dependency(
   include_directories: [include_directories('.')]
 )
 
+meson.override_dependency('libpq', libpq)
+
 # Check for functions that libpq must not call.  See libpq_check.pl for the
 # full set of platform rules.  Skip the test when profiling, as gcc may
 # insert exit() calls for that.

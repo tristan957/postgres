@@ -65,9 +65,9 @@ bitcode_cflags += get_option('c_args')
 bitcode_cflags += cppflags
 
 # XXX: Worth improving on the logic to find directories here
-bitcode_cflags += '-I@BUILD_ROOT@/src/include'
-bitcode_cflags += '-I@BUILD_ROOT@/src/backend/utils/misc'
-bitcode_cflags += '-I@SOURCE_ROOT@/src/include'
+bitcode_cflags += '-I@0@src/include'.format(meson.project_build_root())
+bitcode_cflags += '-I@0@src/backend/utils/misc'.format(meson.project_build_root())
+bitcode_cflags += '-I@0@src/include'.format(meson.project_source_root())
 
 
 # Note this is intentionally not installed to bitcodedir, as it's not for
