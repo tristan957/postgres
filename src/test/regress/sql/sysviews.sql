@@ -70,6 +70,13 @@ select count(*) >= 0 as ok from pg_prepared_xacts;
 -- There will surely be at least one SLRU cache
 select count(*) > 0 as ok from pg_stat_slru;
 
+-- There should be at least one statistics kind loaded
+select count(*) > 0 as ok from pg_stat_kind_info;
+
+-- All rows must have a name and builtin flag
+select count(*) = 0 as ok from pg_stat_kind_info
+  where name is null or builtin is null;
+
 -- There must be only one record
 select count(*) = 1 as ok from pg_stat_wal;
 

@@ -27,6 +27,14 @@ $node->start;
 $node->safe_psql('postgres', q(CREATE EXTENSION test_custom_var_stats));
 $node->safe_psql('postgres', q(CREATE EXTENSION test_custom_fixed_stats));
 
+# Verify custom stats kinds appear in pg_stat_kind_info.
+my $result = $node->safe_psql('postgres',
+	q(SELECT id, name, builtin, shared_size > 0 FROM pg_stat_kind_info
+	    WHERE name LIKE 'test_custom%' ORDER BY name));
+is($result,
+	"26|test_custom_fixed_stats|f|t\n25|test_custom_var_stats|f|t",
+	"custom stats kinds visible in pg_stat_kind_info");
+
 # Create entries for variable-sized stats.
 $node->safe_psql('postgres',
 	q(select test_custom_stats_var_create('entry1', 'Test entry 1')));
@@ -63,7 +71,7 @@ $node->safe_psql('postgres', q(select test_custom_stats_fixed_update()));
 $node->safe_psql('postgres', q(select test_custom_stats_fixed_update()));
 
 # Test data reports.
-my $result = $node->safe_psql('postgres',
+$result = $node->safe_psql('postgres',
 	q(select * from test_custom_stats_var_report('entry1')));
 is( $result,
 	"entry1|2|Test entry 1",

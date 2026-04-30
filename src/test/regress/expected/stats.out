@@ -113,6 +113,26 @@ walwriter|wal|init
 walwriter|wal|normal
 (95 rows)
 \a
+-- List of loaded statistics kinds.
+\a
+SELECT name, builtin FROM pg_stat_kind_info
+  ORDER BY name COLLATE "C";
+name|builtin
+archiver|t
+backend|t
+bgwriter|t
+checkpointer|t
+database|t
+function|t
+io|t
+lock|t
+relation|t
+replslot|t
+slru|t
+subscription|t
+wal|t
+(13 rows)
+\a
 -- ensure that both seqscan and indexscan plans are allowed
 SET enable_seqscan TO on;
 SET enable_indexscan TO on;

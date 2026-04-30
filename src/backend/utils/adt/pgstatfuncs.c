@@ -30,6 +30,8 @@
 #include "storage/procarray.h"
 #include "utils/acl.h"
 #include "utils/builtins.h"
+#include "utils/pgstat_internal.h"
+#include "utils/pgstat_kind.h"
 #include "utils/timestamp.h"
 #include "utils/tuplestore.h"
 #include "utils/wait_event.h"
@@ -1636,6 +1638,53 @@ pg_stat_get_backend_io(PG_FUNCTION_ARGS)
 	pg_stat_io_build_tuples(rsinfo, bktype_stats, bktype,
 							backend_stats->stat_reset_timestamp);
 	return (Datum) 0;
+}
+
+Datum
+pg_stat_get_kind_info(PG_FUNCTION_ARGS)
+{
+#define NUM_KIND_INFO_COLUMNS 5
+	ReturnSetInfo *rsinfo;
+
+	InitMaterializedSRF(fcinfo, 0);
+	rsinfo = (ReturnSetInfo *) fcinfo->resultinfo;
+
+	for (int kind = PGSTAT_KIND_MIN; kind <= PGSTAT_KIND_MAX; kind++)
+	{
+		Datum		values[NUM_KIND_INFO_COLUMNS] = {0};
+		bool		nulls[NUM_KIND_INFO_COLUMNS] = {0};
+		const PgStat_KindInfo *info;
+
+		info = pgstat_get_kind_info(kind);
+		if (info == NULL)
+			continue;
+
+		values[0] = Int32GetDatum(kind);
+		values[1] = CStringGetTextDatum(info->name);
+		values[3] = BoolGetDatum(pgstat_is_kind_builtin(kind));
+		values[4] = Int64GetDatum(info->shared_size);
+
+		if (info->fixed_amount)
+		{
+			values[2] = Int64GetDatum(1);
+		}
+		else
+		{
+			if (info->track_entry_count)
+			{
+				values[2] = Int64GetDatum(pgstat_get_entry_count(kind));
+			}
+			else
+			{
+				nulls[2] = true;
+			}
+		}
+
+		tuplestore_putvalues(rsinfo->setResult, rsinfo->setDesc, values, nulls);
+	}
+
+	return (Datum) 0;
+#undef NUM_KIND_INFO_COLUMNS
 }
 
 /*
