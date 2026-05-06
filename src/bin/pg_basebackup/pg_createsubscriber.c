@@ -759,7 +759,7 @@ modify_subscriber_sysid(const struct CreateSubscriberOptions *opt)
 	cmd_str = psprintf("\"%s\" -D \"%s\" >> \"%s\"", pg_resetwal_path,
 					   subscriber_dir, out_file);
 	if (opt->log_dir)
-		pg_free(out_file);
+		pfree(out_file);
 
 	pg_log_debug("pg_resetwal command is: %s", cmd_str);
 
@@ -774,7 +774,7 @@ modify_subscriber_sysid(const struct CreateSubscriberOptions *opt)
 	}
 
 	pg_free(cf);
-	pg_free(cmd_str);
+	pfree(cmd_str);
 }
 
 /*
@@ -2129,8 +2129,8 @@ set_replication_progress(PGconn *conn, const struct LogicalRepInfo *dbinfo, cons
 
 	PQfreemem(subname);
 	PQfreemem(dbname);
-	pg_free(originname);
-	pg_free(lsnstr);
+	pfree(originname);
+	pfree(lsnstr);
 	destroyPQExpBuffer(str);
 }
 
@@ -2514,7 +2514,7 @@ main(int argc, char **argv)
 		if (!internal_log_file_fp)
 			pg_fatal("could not open log file \"%s\": %m", internal_log_file);
 
-		pg_free(internal_log_file);
+		pfree(internal_log_file);
 
 		pg_logging_set_logfile(internal_log_file_fp);
 	}

@@ -1698,12 +1698,12 @@ archprintf(Archive *AH, const char *fmt,...)
 			break;				/* success */
 
 		/* Release buffer and loop around to try again with larger len. */
-		free(p);
+		pg_free(p);
 		len = cnt;
 	}
 
 	WriteData(AH, p, cnt);
-	free(p);
+	pg_free(p);
 	return (int) cnt;
 }
 
@@ -1802,12 +1802,12 @@ ahprintf(ArchiveHandle *AH, const char *fmt,...)
 			break;				/* success */
 
 		/* Release buffer and loop around to try again with larger len. */
-		free(p);
+		pg_free(p);
 		len = cnt;
 	}
 
 	ahwrite(p, 1, cnt, AH);
-	free(p);
+	pg_free(p);
 	return (int) cnt;
 }
 
@@ -2865,7 +2865,7 @@ ReadToc(ArchiveHandle *AH)
 			}
 			else
 			{
-				free(deps);
+				pg_free(deps);
 				te->dependencies = NULL;
 				te->nDeps = 0;
 			}
@@ -2925,7 +2925,7 @@ processEncodingEntry(ArchiveHandle *AH, TocEntry *te)
 		pg_fatal("invalid ENCODING item: %s",
 				 te->defn);
 
-	free(defn);
+	pg_free(defn);
 }
 
 static void
@@ -3908,7 +3908,7 @@ _getObjectDescription(PQExpBuffer buf, const TocEntry *te)
 
 		appendPQExpBufferStr(buf, first);
 
-		free(first);
+		pg_free(first);
 		return;
 	}
 	/* these object types don't have separate owners */
@@ -4124,7 +4124,7 @@ _printTocEntry(ArchiveHandle *AH, TocEntry *te, const char *pfx)
 			char	   *cmdEnd = psprintf(" OWNER TO %s", fmtId(te->owner));
 
 			IssueCommandPerBlob(AH, te, "ALTER LARGE OBJECT ", cmdEnd);
-			pg_free(cmdEnd);
+			pfree(cmdEnd);
 		}
 		else
 		{
@@ -5104,7 +5104,7 @@ identify_locking_dependencies(ArchiveHandle *AH, TocEntry *te)
 
 	if (nlockids == 0)
 	{
-		free(lockids);
+		pg_free(lockids);
 		return;
 	}
 

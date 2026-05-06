@@ -2857,7 +2857,7 @@ main(int argc, char **argv)
 
 		if (symlink(xlog_dir, linkloc) != 0)
 			pg_fatal("could not create symbolic link \"%s\": %m", linkloc);
-		free(linkloc);
+		pfree(linkloc);
 	}
 
 	BaseBackup(compression_algorithm, compression_detail, compressloc,
