@@ -8,6 +8,7 @@
 
 #line 1 "indicators.pgc"
 #include <stdio.h>
+#include <ecpgerrno.h>
 
 
 #line 1 "sqlca.h"
@@ -78,7 +79,7 @@ struct sqlca_t *ECPGget_sqlca(void);
 
 #endif
 
-#line 3 "indicators.pgc"
+#line 4 "indicators.pgc"
 
 
 #line 1 "regression.h"
@@ -88,7 +89,7 @@ struct sqlca_t *ECPGget_sqlca(void);
 
 
 
-#line 4 "indicators.pgc"
+#line 5 "indicators.pgc"
 
 
 int main(void)
@@ -96,68 +97,72 @@ int main(void)
 	/* exec sql begin declare section */
 		   
 		   
+		 
 	
-#line 9 "indicators.pgc"
+#line 10 "indicators.pgc"
  int intvar = 5 ;
  
-#line 10 "indicators.pgc"
- int nullind = - 1 ;
-/* exec sql end declare section */
 #line 11 "indicators.pgc"
+ int nullind = - 1 ;
+ 
+#line 12 "indicators.pgc"
+ float floatvar ;
+/* exec sql end declare section */
+#line 13 "indicators.pgc"
 
 
 	ECPGdebug(1,stderr);
 
 	{ ECPGconnect(__LINE__, 0, "ecpg1_regression" , NULL, NULL , NULL, 0); }
-#line 15 "indicators.pgc"
+#line 17 "indicators.pgc"
 
 	{ ECPGsetcommit(__LINE__, "off", NULL);}
-#line 16 "indicators.pgc"
+#line 18 "indicators.pgc"
 
 
 	{ ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "create table indicator_test ( \"id\" int primary key , \"str\" text not null , val int null )", ECPGt_EOIT, ECPGt_EORT);}
-#line 21 "indicators.pgc"
+#line 23 "indicators.pgc"
 
 	{ ECPGtrans(__LINE__, NULL, "commit work");}
-#line 22 "indicators.pgc"
+#line 24 "indicators.pgc"
 
 
 	{ ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "insert into indicator_test ( id , str , val ) values ( 1 , 'Hello' , 0 )", ECPGt_EOIT, ECPGt_EORT);}
-#line 24 "indicators.pgc"
+#line 26 "indicators.pgc"
 
 
 	/* use indicator in insert */
 	{ ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "insert into indicator_test ( id , str , val ) values ( 2 , 'Hi there' , $1  )", 
 	ECPGt_int,&(intvar),(long)1,(long)1,sizeof(int), 
 	ECPGt_int,&(nullind),(long)1,(long)1,sizeof(int), ECPGt_EOIT, ECPGt_EORT);}
-#line 27 "indicators.pgc"
+#line 29 "indicators.pgc"
 
 	nullind = 0;
 	{ ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "insert into indicator_test ( id , str , val ) values ( 3 , 'Good evening' , $1  )", 
 	ECPGt_int,&(intvar),(long)1,(long)1,sizeof(int), 
 	ECPGt_int,&(nullind),(long)1,(long)1,sizeof(int), ECPGt_EOIT, ECPGt_EORT);}
-#line 29 "indicators.pgc"
+#line 31 "indicators.pgc"
 
 	{ ECPGtrans(__LINE__, NULL, "commit work");}
-#line 30 "indicators.pgc"
+#line 32 "indicators.pgc"
 
 
 	/* use indicators to get information about selects */
 	{ ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "select val from indicator_test where id = 1", ECPGt_EOIT, 
 	ECPGt_int,&(intvar),(long)1,(long)1,sizeof(int), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EORT);}
-#line 33 "indicators.pgc"
+#line 35 "indicators.pgc"
 
 	{ ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "select val from indicator_test where id = 2", ECPGt_EOIT, 
 	ECPGt_int,&(intvar),(long)1,(long)1,sizeof(int), 
 	ECPGt_int,&(nullind),(long)1,(long)1,sizeof(int), ECPGt_EORT);}
-#line 34 "indicators.pgc"
+#line 36 "indicators.pgc"
 
 	printf("intvar: %d, nullind: %d\n", intvar, nullind);
 	{ ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "select val from indicator_test where id = 3", ECPGt_EOIT, 
 	ECPGt_int,&(intvar),(long)1,(long)1,sizeof(int), 
 	ECPGt_int,&(nullind),(long)1,(long)1,sizeof(int), ECPGt_EORT);}
-#line 36 "indicators.pgc"
+#line 38 "indicators.pgc"
 
 	printf("intvar: %d, nullind: %d\n", intvar, nullind);
 
@@ -166,24 +171,57 @@ int main(void)
 	{ ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "update indicator_test set val = $1  where id = 1", 
 	ECPGt_int,&(intvar),(long)1,(long)1,sizeof(int), 
 	ECPGt_int,&(nullind),(long)1,(long)1,sizeof(int), ECPGt_EOIT, ECPGt_EORT);}
-#line 41 "indicators.pgc"
+#line 43 "indicators.pgc"
 
 	{ ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "select val from indicator_test where id = 1", ECPGt_EOIT, 
 	ECPGt_int,&(intvar),(long)1,(long)1,sizeof(int), 
 	ECPGt_int,&(nullind),(long)1,(long)1,sizeof(int), ECPGt_EORT);}
-#line 42 "indicators.pgc"
+#line 44 "indicators.pgc"
 
 	printf("intvar: %d, nullind: %d\n", intvar, nullind);
 
-	{ ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "drop table indicator_test", ECPGt_EOIT, ECPGt_EORT);}
-#line 45 "indicators.pgc"
+	/*
+	 * An empty string used to be silently converted to 0 instead of being
+	 * rejected as an invalid integer/float.
+	 */
+	{ ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "insert into indicator_test ( id , str , val ) values ( 4 , '' , 0 )", ECPGt_EOIT, ECPGt_EORT);}
+#line 51 "indicators.pgc"
 
 	{ ECPGtrans(__LINE__, NULL, "commit work");}
-#line 46 "indicators.pgc"
+#line 52 "indicators.pgc"
+
+
+	{ ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "select str from indicator_test where id = 4", ECPGt_EOIT, 
+	ECPGt_int,&(intvar),(long)1,(long)1,sizeof(int), 
+	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EORT);}
+#line 54 "indicators.pgc"
+
+	if (sqlca.sqlcode == ECPG_INT_FORMAT)
+		printf("empty string correctly rejected as integer\n");
+	else
+		printf("unexpected sqlcode %ld for empty string as integer: %s\n",
+			   sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
+
+	{ ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "select str from indicator_test where id = 4", ECPGt_EOIT, 
+	ECPGt_float,&(floatvar),(long)1,(long)1,sizeof(float), 
+	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EORT);}
+#line 61 "indicators.pgc"
+
+	if (sqlca.sqlcode == ECPG_FLOAT_FORMAT)
+		printf("empty string correctly rejected as float\n");
+	else
+		printf("unexpected sqlcode %ld for empty string as float: %s\n",
+			   sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
+
+	{ ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "drop table indicator_test", ECPGt_EOIT, ECPGt_EORT);}
+#line 68 "indicators.pgc"
+
+	{ ECPGtrans(__LINE__, NULL, "commit work");}
+#line 69 "indicators.pgc"
 
 
 	{ ECPGdisconnect(__LINE__, "CURRENT");}
-#line 48 "indicators.pgc"
+#line 71 "indicators.pgc"
 
 	return 0;
 }

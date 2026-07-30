@@ -373,7 +373,7 @@ ecpg_get_data(const PGresult *results, int act_tuple, int act_field, int lineno,
 				case ECPGt_int:
 				case ECPGt_long:
 					res = strtol(pval, &scan_length, 10);
-					if (garbage_left(isarray, &scan_length, compat))
+					if (scan_length == pval || garbage_left(isarray, &scan_length, compat))
 					{
 						ecpg_raise(lineno, ECPG_INT_FORMAT,
 								   ECPG_SQLSTATE_DATATYPE_MISMATCH, pval);
@@ -402,7 +402,7 @@ ecpg_get_data(const PGresult *results, int act_tuple, int act_field, int lineno,
 				case ECPGt_unsigned_int:
 				case ECPGt_unsigned_long:
 					ures = strtoul(pval, &scan_length, 10);
-					if (garbage_left(isarray, &scan_length, compat))
+					if (scan_length == pval || garbage_left(isarray, &scan_length, compat))
 					{
 						ecpg_raise(lineno, ECPG_UINT_FORMAT,
 								   ECPG_SQLSTATE_DATATYPE_MISMATCH, pval);
@@ -429,7 +429,7 @@ ecpg_get_data(const PGresult *results, int act_tuple, int act_field, int lineno,
 
 				case ECPGt_long_long:
 					*((long long int *) (var + offset * act_tuple)) = strtoll(pval, &scan_length, 10);
-					if (garbage_left(isarray, &scan_length, compat))
+					if (scan_length == pval || garbage_left(isarray, &scan_length, compat))
 					{
 						ecpg_raise(lineno, ECPG_INT_FORMAT, ECPG_SQLSTATE_DATATYPE_MISMATCH, pval);
 						return false;
@@ -440,7 +440,7 @@ ecpg_get_data(const PGresult *results, int act_tuple, int act_field, int lineno,
 
 				case ECPGt_unsigned_long_long:
 					*((unsigned long long int *) (var + offset * act_tuple)) = strtoull(pval, &scan_length, 10);
-					if (garbage_left(isarray, &scan_length, compat))
+					if (scan_length == pval || garbage_left(isarray, &scan_length, compat))
 					{
 						ecpg_raise(lineno, ECPG_UINT_FORMAT, ECPG_SQLSTATE_DATATYPE_MISMATCH, pval);
 						return false;
@@ -456,6 +456,13 @@ ecpg_get_data(const PGresult *results, int act_tuple, int act_field, int lineno,
 
 					if (!check_special_value(pval, &dres, &scan_length))
 						dres = strtod(pval, &scan_length);
+
+					if (scan_length == pval)
+					{
+						ecpg_raise(lineno, ECPG_FLOAT_FORMAT,
+								   ECPG_SQLSTATE_DATATYPE_MISMATCH, pval);
+						return false;
+					}
 
 					if (isarray && *scan_length == '"')
 						scan_length++;

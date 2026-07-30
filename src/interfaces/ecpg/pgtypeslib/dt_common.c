@@ -2505,7 +2505,7 @@ pgtypes_defmt_scan(union un_fmt_comb *scan_val, int scan_type, char **pstr, char
 				(*pstr)++;
 			errno = 0;
 			scan_val->uint_val = (unsigned int) strtol(*pstr, &strtol_end, 10);
-			if (errno)
+			if (errno || strtol_end == *pstr)
 				err = 1;
 			break;
 		case PGTYPES_TYPE_UINT_LONG:
@@ -2513,7 +2513,7 @@ pgtypes_defmt_scan(union un_fmt_comb *scan_val, int scan_type, char **pstr, char
 				(*pstr)++;
 			errno = 0;
 			scan_val->luint_val = (unsigned long int) strtol(*pstr, &strtol_end, 10);
-			if (errno)
+			if (errno || strtol_end == *pstr)
 				err = 1;
 			break;
 		case PGTYPES_TYPE_STRING_MALLOCED:

@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <ecpgerrno.h>
 
 exec sql include sqlca;
 exec sql include ../regression;
@@ -8,6 +9,7 @@ int main(void)
 	exec sql begin declare section;
 		int intvar = 5;
 		int nullind = -1;
+		float floatvar;
 	exec sql end declare section;
 
 	ECPGdebug(1,stderr);
@@ -41,6 +43,27 @@ int main(void)
 	exec sql update indicator_test set val = :intvar :nullind where id = 1;
 	exec sql select val into :intvar :nullind from indicator_test where id = 1;
 	printf("intvar: %d, nullind: %d\n", intvar, nullind);
+
+	/*
+	 * An empty string used to be silently converted to 0 instead of being
+	 * rejected as an invalid integer/float.
+	 */
+	exec sql insert into indicator_test (id, str, val) values ( 4, '', 0);
+	exec sql commit work;
+
+	exec sql select str into :intvar from indicator_test where id = 4;
+	if (sqlca.sqlcode == ECPG_INT_FORMAT)
+		printf("empty string correctly rejected as integer\n");
+	else
+		printf("unexpected sqlcode %ld for empty string as integer: %s\n",
+			   sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
+
+	exec sql select str into :floatvar from indicator_test where id = 4;
+	if (sqlca.sqlcode == ECPG_FLOAT_FORMAT)
+		printf("empty string correctly rejected as float\n");
+	else
+		printf("unexpected sqlcode %ld for empty string as float: %s\n",
+			   sqlca.sqlcode, sqlca.sqlerrm.sqlerrmc);
 
 	exec sql drop table indicator_test;
 	exec sql commit work;
